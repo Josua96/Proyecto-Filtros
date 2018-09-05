@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Proyecto.Properties
+namespace ProyectoFiltros.Properties
 {
 
 
