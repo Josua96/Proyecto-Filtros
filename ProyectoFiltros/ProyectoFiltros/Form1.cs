@@ -96,8 +96,8 @@ namespace ProyectoFiltros
 
         private void filterTypeImage(Image image)
         {
+
             
-        
             Bitmap imagePixels = new Bitmap(image);
 
             switch (availableFilters.SelectedIndex)
@@ -108,6 +108,10 @@ namespace ProyectoFiltros
 
                 case 1:
                     traditionalFilter.grayScaleFilter(imagePixels);
+                    break;
+
+                case 2:
+                    traditionalFilter.GaussinBlurFilter(imagePixels, new Rectangle(0, 0, imagePixels.Width, imagePixels.Height), 4 );
                     break;
 
                 default:
