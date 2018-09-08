@@ -36,7 +36,13 @@
             this.previousImage = new System.Windows.Forms.Button();
             this.nextImage = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.filterAmount = new System.Windows.Forms.Label();
+            this.filterPercentage = new System.Windows.Forms.TextBox();
+            this.conPerdida = new System.Windows.Forms.RadioButton();
+            this.sinPerdida = new System.Windows.Forms.RadioButton();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
             ((System.ComponentModel.ISupportInitialize)(this.imageContainer)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // availableFilters
@@ -46,6 +52,7 @@
             this.availableFilters.Name = "availableFilters";
             this.availableFilters.Size = new System.Drawing.Size(130, 21);
             this.availableFilters.TabIndex = 0;
+            this.availableFilters.SelectionChangeCommitted += new System.EventHandler(this.availableFilters_SelectionChangeCommitted);
             // 
             // applyFilter
             // 
@@ -79,6 +86,9 @@
             // 
             // imageContainer
             // 
+            this.imageContainer.AccessibleDescription = "";
+            this.imageContainer.AccessibleName = "";
+            this.imageContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.imageContainer.Location = new System.Drawing.Point(61, 108);
             this.imageContainer.Name = "imageContainer";
             this.imageContainer.Size = new System.Drawing.Size(401, 258);
@@ -117,12 +127,69 @@
             this.label1.TabIndex = 7;
             this.label1.Text = "Tipos de filtros";
             // 
+            // filterAmount
+            // 
+            this.filterAmount.AutoSize = true;
+            this.filterAmount.Font = new System.Drawing.Font("Microsoft Sans Serif", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.filterAmount.Location = new System.Drawing.Point(747, 124);
+            this.filterAmount.Name = "filterAmount";
+            this.filterAmount.Size = new System.Drawing.Size(0, 29);
+            this.filterAmount.TabIndex = 8;
+            // 
+            // filterPercentage
+            // 
+            this.filterPercentage.Location = new System.Drawing.Point(752, 180);
+            this.filterPercentage.Name = "filterPercentage";
+            this.filterPercentage.Size = new System.Drawing.Size(98, 20);
+            this.filterPercentage.TabIndex = 9;
+            this.filterPercentage.Visible = false;
+            // 
+            // conPerdida
+            // 
+            this.conPerdida.AutoSize = true;
+            this.conPerdida.Location = new System.Drawing.Point(6, 18);
+            this.conPerdida.Name = "conPerdida";
+            this.conPerdida.Size = new System.Drawing.Size(34, 17);
+            this.conPerdida.TabIndex = 10;
+            this.conPerdida.TabStop = true;
+            this.conPerdida.Text = "Si";
+            this.conPerdida.UseVisualStyleBackColor = true;
+            this.conPerdida.Visible = false;
+            // 
+            // sinPerdida
+            // 
+            this.sinPerdida.AutoSize = true;
+            this.sinPerdida.Location = new System.Drawing.Point(70, 19);
+            this.sinPerdida.Name = "sinPerdida";
+            this.sinPerdida.Size = new System.Drawing.Size(39, 17);
+            this.sinPerdida.TabIndex = 11;
+            this.sinPerdida.TabStop = true;
+            this.sinPerdida.Text = "No";
+            this.sinPerdida.UseVisualStyleBackColor = true;
+            this.sinPerdida.Visible = false;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.conPerdida);
+            this.groupBox1.Controls.Add(this.sinPerdida);
+            this.groupBox1.Location = new System.Drawing.Point(752, 159);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(123, 41);
+            this.groupBox1.TabIndex = 12;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Visible = false;
+            // 
             // Form1
             // 
+            this.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.ClientSize = new System.Drawing.Size(1009, 548);
+            this.CausesValidation = false;
+            this.ClientSize = new System.Drawing.Size(1036, 495);
+            this.Controls.Add(this.groupBox1);
+            this.Controls.Add(this.filterPercentage);
+            this.Controls.Add(this.filterAmount);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.nextImage);
             this.Controls.Add(this.previousImage);
@@ -132,8 +199,10 @@
             this.Controls.Add(this.applyFilter);
             this.Controls.Add(this.availableFilters);
             this.Name = "Form1";
-            this.Text = "mainView";
+            this.Text = "MainView";
             ((System.ComponentModel.ISupportInitialize)(this.imageContainer)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -149,6 +218,11 @@
         private System.Windows.Forms.Button previousImage;
         private System.Windows.Forms.Button nextImage;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label filterAmount;
+        private System.Windows.Forms.TextBox filterPercentage;
+        private System.Windows.Forms.RadioButton conPerdida;
+        private System.Windows.Forms.RadioButton sinPerdida;
+        private System.Windows.Forms.GroupBox groupBox1;
     }
 }
 

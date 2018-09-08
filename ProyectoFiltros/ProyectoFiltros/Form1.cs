@@ -35,25 +35,26 @@ namespace ProyectoFiltros
         {
             availableFilters.Items.Add("Sepia");
             availableFilters.Items.Add("Escala de grises");
+            availableFilters.Items.Add("Opacidad");
+            availableFilters.Items.Add("Invertir colores");
             availableFilters.Items.Add("Desenfoque Gaussiano");
-
-
+            availableFilters.Items.Add("Ajuste de brillo");
+            availableFilters.Items.Add("Compresión");
+            availableFilters.Items.Add("Segmentación");
+            availableFilters.Items.Add("Textura");
         }
 
-        private void setImages (string []imageNames)
+        private void setImages(string[] imageNames)
         {
             images.Clear();
             foreach (String image in imageNames)
             {
                 images.Add(Image.FromFile(image));
             }
-            imageContainer.Image = (Image) images[0];
+            imageContainer.Image = (Image)images[0];
             imageIndex = 0;
 
         }
-
-
-
 
 
         private void searchImage_Click(object sender, EventArgs e)
@@ -68,7 +69,7 @@ namespace ProyectoFiltros
             {
 
                 this.setImages(fileExplorer.FileNames);
-               
+
             }
         }
 
@@ -85,7 +86,7 @@ namespace ProyectoFiltros
 
         private void nextImage_Click(object sender, EventArgs e)
         {
-            if (imageIndex < images.Count-1)
+            if (imageIndex < images.Count - 1)
             {
                 imageIndex++;
                 imageContainer.Image = (Image)images[imageIndex];
@@ -97,7 +98,6 @@ namespace ProyectoFiltros
         private void filterTypeImage(Image image)
         {
 
-            
             Bitmap imagePixels = new Bitmap(image);
 
             switch (availableFilters.SelectedIndex)
@@ -105,15 +105,23 @@ namespace ProyectoFiltros
                 case 0:
                     traditionalFilter.sepiaFilter(imagePixels);
                     break;
-
                 case 1:
                     traditionalFilter.grayScaleFilter(imagePixels);
                     break;
-
                 case 2:
-                    traditionalFilter.GaussinBlurFilter(imagePixels, new Rectangle(0, 0, imagePixels.Width, imagePixels.Height), 4 );
+                    try { traditionalFilter.opacityFilter(imagePixels, Convert.ToDouble(filterPercentage.Text)); }
+                    catch { traditionalFilter.opacityFilter(imagePixels, 55); }
                     break;
-
+                case 3:
+                    traditionalFilter.invertColorsFilter(imagePixels);
+                    break;
+                case 4:
+                    traditionalFilter.GaussinBlurFilter(imagePixels, new Rectangle(0, 0, imagePixels.Width, imagePixels.Height), 4);
+                    break;
+                case 5:
+                    try { traditionalFilter.brightFilter(imagePixels, Convert.ToDouble(filterPercentage.Text) / 100); }
+                    catch { traditionalFilter.brightFilter(imagePixels, 0.5); }
+                    break;
                 default:
                     break;
             }
@@ -123,10 +131,40 @@ namespace ProyectoFiltros
         {
             if (images.Count > 0)
             {
-                filterTypeImage( imageContainer.Image);
+                filterTypeImage(imageContainer.Image);
             }
-            
+        }
 
+        private void availableFilters_SelectionChangeCommitted(object sender, EventArgs e)
+        {
+            filterAmount.Text = "";
+            filterAmount.Visible = false;
+            filterPercentage.Text = "";
+            filterPercentage.Visible = false;
+            conPerdida.Visible = false;
+            sinPerdida.Visible = false;
+
+            if (availableFilters.SelectedIndex == 2)
+            {
+                filterAmount.Text = "Porcentaje de opacidad";
+                filterAmount.Visible = true;
+                filterPercentage.Visible = true;
+            }
+            else if (availableFilters.SelectedIndex == 5)
+            {
+                filterAmount.Text = "Porcentaje de brillo";
+                filterAmount.Visible = true;
+                filterPercentage.Visible = true;
+
+            }
+            else if (availableFilters.SelectedIndex == 6)
+            {
+                filterAmount.Text = "Pérdida";
+                filterAmount.Visible = true;
+                groupBox1.Visible = true;
+                conPerdida.Visible = true;
+                sinPerdida.Visible = true;
+            }
         }
     }
 }
