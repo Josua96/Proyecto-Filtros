@@ -9,19 +9,23 @@ namespace ProyectoFiltros
 {
     class pixelTransformer
     {
+
+        private float r, g, b;
+
         public pixelTransformer()
         {
 
         }
 
-        public Color toSepia (Color pixel)
+        public void toSepia ( byte[] pixelsData, ref int i)
         {
-            int r, g, b;
-
-            r = Convert.ToInt32(0.393 * pixel.R + 0.769 * pixel.G + 0.189 * pixel.B);
-            g = Convert.ToInt32(0.349 * pixel.R + 0.686 * pixel.G + 0.168 * pixel.B);
-            b = Convert.ToInt32(0.272 * pixel.R + 0.534 * pixel.G + 0.131 * pixel.B);
             
+            r= 0.393f * pixelsData[i+2] + 0.769f * pixelsData[i+1] + 0.189f * pixelsData[i];
+            g = 0.349f * pixelsData[i+2] + 0.686f * pixelsData[i + 1] + 0.168f * pixelsData[i];
+            b = 0.272f * pixelsData[i+2] + 0.534f * pixelsData[i + 1] + 0.131f * pixelsData[i];
+
+           
+        
             if (r > 255)
             {
                 r = 255;
@@ -35,14 +39,19 @@ namespace ProyectoFiltros
             {
                 b = 255;
             }
-            return Color.FromArgb(r, g, b);
+
+            pixelsData[i+2] = (byte) r;
+            pixelsData[i+1] = (byte)g;
+            pixelsData[i] = (byte)b;
+            return;
 
         }
 
-        public Color toGrayScale(Color pixel)
+        public void toGrayScale(byte[] pixelsData, ref int i)
         {
-            int average= Convert.ToInt32((pixel.R + pixel.G + pixel.B) / 3); 
-            return Color.FromArgb(average, average, average);
+            pixelsData [i] = (byte) ((pixelsData[i] + pixelsData[i+1] + pixelsData[i+2] ) / 3f);
+            pixelsData[i + 1] = pixelsData[i + 2] = pixelsData[i];
+            return;
         }
     }
 }

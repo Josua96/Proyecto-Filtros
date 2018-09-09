@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,44 +28,76 @@ namespace ProyectoFiltros
             image.Save(toPath + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".jpg");
         }
 
-        public void sepiaFilter(Bitmap image)
+        
+        public void sepiaFilter(Bitmap bmpNew)
         {
-            int width = image.Width;
-            int heigth = image.Height;
-            Color pixel;
 
-            for (int x = 0; x < width; x++)
+            BitmapData bmpData = bmpNew.LockBits(new Rectangle(0, 0, bmpNew.Width, bmpNew.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+
+            IntPtr ptr = bmpData.Scan0;
+
+
+            byte[] byteBuffer = new byte[bmpData.Stride * bmpNew.Height];
+
+
+            Marshal.Copy(ptr, byteBuffer, 0, byteBuffer.Length);
+
+            int limit = byteBuffer.Length; 
+
+            for (int i = 0; i < limit ; i += 4)
             {
-                for (int y = 0; y < heigth; y++)
-                {
-                    pixel = image.GetPixel(x, y);
-                    image.SetPixel(x, y, pixelManager.toSepia(pixel));
-                }
-
+                pixelManager.toSepia(byteBuffer, ref i);
             }
 
-            saveImage(image);
+
+            Marshal.Copy(byteBuffer, 0, ptr, byteBuffer.Length);
+
+
+            bmpNew.UnlockBits(bmpData);
+
+            bmpData = null;
+            byteBuffer = null;
+
+            saveImage(bmpNew);
+
+            return;
 
         }
 
-        public void grayScaleFilter(Bitmap image)
+        public void grayScaleFilter(Bitmap bmpNew)
         {
-            int width = image.Width;
-            int heigth = image.Height;
+            BitmapData bmpData = bmpNew.LockBits(new Rectangle(0, 0, bmpNew.Width, bmpNew.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
 
+            IntPtr ptr = bmpData.Scan0;
 
-            for (int x = 0; x < width; x++)
+
+            byte[] byteBuffer = new byte[bmpData.Stride * bmpNew.Height];
+
+
+            Marshal.Copy(ptr, byteBuffer, 0, byteBuffer.Length);
+
+            int limit = byteBuffer.Length;
+
+            for (int i = 0; i < limit; i += 4)
             {
-                for (int y = 0; y < heigth; y++)
-                {
-                    Color pixel = image.GetPixel(x, y);
-                    image.SetPixel(x, y, pixelManager.toGrayScale(pixel));
-                }
-
+                pixelManager.toGrayScale(byteBuffer, ref i);
             }
 
-            saveImage(image);
+
+            Marshal.Copy(byteBuffer, 0, ptr, byteBuffer.Length);
+
+
+            bmpNew.UnlockBits(bmpData);
+
+            bmpData = null;
+            byteBuffer = null;
+
+            saveImage(bmpNew);
+
+            return;
+
 
         }
 
@@ -77,8 +111,8 @@ namespace ProyectoFiltros
                 graphics.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height),
                     new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
 
-          
 
+          
             // look at every pixel in the blur rectangle
             for (Int32 xx = rectangle.X; xx < rectangle.X + rectangle.Width; xx++)
             {
