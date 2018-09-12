@@ -13,13 +13,12 @@ namespace ProyectoFiltros
     class TraditionalImageFiltering
     {
 
-        private pixelTransformer pixelManager;
 
         private string toPath;
 
         public TraditionalImageFiltering()
         {
-            this.pixelManager = new pixelTransformer();
+            
             this.toPath = Directory.GetCurrentDirectory() + "\\outputimages\\" + "image";
         }
 
@@ -29,8 +28,10 @@ namespace ProyectoFiltros
         }
 
         
-        public void sepiaFilter(Bitmap bmpNew)
+        public void sepiaFilter(Bitmap image)
         {
+
+            Bitmap bmpNew = new Bitmap(image);
 
             BitmapData bmpData = bmpNew.LockBits(new Rectangle(0, 0, bmpNew.Width, bmpNew.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
@@ -89,8 +90,11 @@ namespace ProyectoFiltros
 
         }
 
-        public void grayScaleFilter(Bitmap bmpNew)
+        public void grayScaleFilter(Bitmap image)
         {
+
+            Bitmap bmpNew = new Bitmap(image);
+
             BitmapData bmpData = bmpNew.LockBits(new Rectangle(0, 0, bmpNew.Width, bmpNew.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
 
             IntPtr ptr = bmpData.Scan0;

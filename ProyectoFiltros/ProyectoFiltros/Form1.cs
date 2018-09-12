@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProyectoFiltros.Clases;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,6 +19,7 @@ namespace ProyectoFiltros
     {
 
         private TraditionalImageFiltering traditionalFilter;
+        private OptimizedImageFiltering opmitizedFilter;
         private ArrayList images;
         private int imageIndex;
         private int filterIndex;
@@ -27,6 +29,8 @@ namespace ProyectoFiltros
             InitializeComponent();
 
             traditionalFilter = new TraditionalImageFiltering();
+
+            opmitizedFilter = new OptimizedImageFiltering(); 
 
             images =new ArrayList();
             setFiltersType();
@@ -98,6 +102,29 @@ namespace ProyectoFiltros
             }
         }
 
+        private void updateTime (int code,string time)
+        {
+            if (code==1)
+            {
+                this.BeginInvoke(new Action(() =>
+                {
+
+                    traditionalMethod.Text = time;
+
+                }));
+            }
+
+            else
+            {
+                this.BeginInvoke(new Action(() =>
+                {
+                    
+                    optimizedMethod.Text = time;
+
+                }));
+            }
+        }
+
         private void filterTypeImage()
         {
 
@@ -112,11 +139,21 @@ namespace ProyectoFiltros
                     watch.Start();
                     traditionalFilter.sepiaFilter(imagePixels);              
                     watch.Stop();
+                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s" );
+                    watch.Start();
+                    opmitizedFilter.sepiaFilter(imagePixels);
+                    watch.Stop();
+                    this.updateTime( 2 , watch.Elapsed.TotalSeconds.ToString() + " s");
                     break;
                 case 1:
                     watch.Start();
                     traditionalFilter.grayScaleFilter(imagePixels);
                     watch.Stop();
+                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                    watch.Start();
+                    opmitizedFilter.grayScaleFilter(imagePixels);
+                    watch.Stop();
+                    this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
                     break;
                 case 2:
                     watch.Start();
@@ -147,14 +184,8 @@ namespace ProyectoFiltros
 
             }
 
-            this.BeginInvoke(new Action(() =>
-            {
-                //update time required label
-                traditionalMethod.Text = watch.Elapsed.TotalSeconds.ToString() + " s";
-            }));
-
-           
             
+ 
         }
 
         private void applyFilter_Click(object sender, EventArgs e)
