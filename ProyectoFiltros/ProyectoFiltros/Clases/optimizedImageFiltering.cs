@@ -191,6 +191,84 @@ namespace ProyectoFiltros.Clases
         }
 
 
+        public void colorsBalance(Bitmap imageBitMap)
+        {
+            Bitmap image = new Bitmap(imageBitMap);
+
+            unsafe
+            {
+                BitmapData bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
+
+                //cantidad de bytes que tiene un pixel
+                int bytesPerPixel = System.Drawing.Bitmap.GetPixelFormatSize(image.PixelFormat) / 8;
+
+                int heightInPixels = bitmapData.Height;
+
+                //la cantidad de bytes constituidos unicamente por la anchura de la imagen, y el espacio en bytes que ocupa cada pixel
+                int widthInBytes = bitmapData.Width * bytesPerPixel;
+
+                byte* PtrFirstPixel = (byte*)bitmapData.Scan0; //obtener el primer byte (la primera línea) en el mapa de bits
+
+
+
+                Parallel.For(0, heightInPixels, y =>
+                {
+
+                    // obtener la posición del primer byte que corresponde al valor de y = int
+                    byte* currentLine = PtrFirstPixel + (y * bitmapData.Stride);
+                    for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
+                    {
+
+                        float blue = 255.0f / 147f * currentLine[x];
+                        float green = 255.0f / 150f * currentLine[x + 1];
+                        float red = 255.0f / 127f * currentLine[x + 2];
+
+                        if (blue > 255)
+                        {
+                            blue = 255;
+                        }
+                        else if (blue < 0)
+                        {
+                            blue = 0;
+                        }
+
+                        if (green > 255)
+                        {
+                            green = 255;
+                        }
+                        else if (green < 0)
+                        {
+                            green = 0;
+                        }
+
+                        if (red > 255)
+                        {
+                            red = 255;
+                        }
+                        else if (red < 0)
+                        {
+                            red = 0;
+                        }
+
+                        currentLine[x] = (byte)blue;
+                        currentLine[x + 1] = (byte)green;
+                        currentLine[x + 2] = (byte)red;
+
+                    }
+
+                });
+
+
+                image.UnlockBits(bitmapData);
+
+                saveImage(image);
+
+            }
+
+            return;
+        }
+
+
 
 
 

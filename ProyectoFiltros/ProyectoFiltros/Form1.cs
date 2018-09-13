@@ -23,19 +23,24 @@ namespace ProyectoFiltros
         private ArrayList images;
         private int imageIndex;
         private int filterIndex;
+        private ColorSubstitutionFilter colorSubstitution;
 
         public Form1()
         {
             InitializeComponent();
 
+            
             traditionalFilter = new TraditionalImageFiltering();
 
-            opmitizedFilter = new OptimizedImageFiltering(); 
+            opmitizedFilter = new OptimizedImageFiltering();
+
+            colorSubstitution = new ColorSubstitutionFilter();
 
             images =new ArrayList();
             setFiltersType();
             availableFilters.SelectedIndex = 0;
             imageContainer.SizeMode = PictureBoxSizeMode.StretchImage;
+
         }
 
         private void setFiltersType()
@@ -49,6 +54,9 @@ namespace ProyectoFiltros
             availableFilters.Items.Add("Compresión");
             availableFilters.Items.Add("Segmentación");
             availableFilters.Items.Add("Textura");
+            availableFilters.Items.Add("Balance de colores");
+            availableFilters.Items.Add("Remplazo de color");
+
         }
 
         private void setImages(string[] imageNames)
@@ -179,6 +187,21 @@ namespace ProyectoFiltros
                     watch.Stop();
                     break;
 
+                case 9:
+                    watch.Start();
+                    traditionalFilter.colorsBalance(imagePixels);
+                    watch.Stop();
+                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                    break;
+
+                case 10:
+                    watch.Start();
+                    traditionalFilter.colorSubstitution(imagePixels,colorSubstitution);
+                    watch.Stop();
+                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                    break;
+
+
                 default:
                     break;
 
@@ -188,14 +211,69 @@ namespace ProyectoFiltros
  
         }
 
+
+      
+        private void colorSelection()
+        {
+            
+            ColorDialog colorSelector = new ColorDialog();
+           
+            if (colorSelector.ShowDialog() == DialogResult.OK)
+            {
+                colorSubstitution.SourceColor(colorSelector.Color);
+                colorSelector.Color = Color.White;
+
+                if (colorSelector.ShowDialog() == DialogResult.OK)
+                {
+                    colorSubstitution.NewColor(colorSelector.Color);
+                    colorSelector.Color = Color.White;
+                    colorSubstitution.setCorrectColorSelection(true);
+
+                }
+                else
+                {
+                    colorSubstitution.setCorrectColorSelection(false);
+                }
+
+            }
+
+            else
+            {
+                colorSubstitution.setCorrectColorSelection(false);
+            }
+
+            return; 
+
+        }
+
+        private void initFilterApplication()
+        {
+
+            Thread filterThread = new Thread(this.filterTypeImage);
+            filterThread.Start();
+
+        }
+
         private void applyFilter_Click(object sender, EventArgs e)
         {
             if (images.Count > 0)
             {
                 filterIndex = availableFilters.SelectedIndex;
-                Thread filterThread = new Thread(this.filterTypeImage);
-                filterThread.Start();
 
+                if (filterIndex== 10)
+                {
+                    this.colorSelection();
+                    if (this.colorSubstitution.getCorrectColorSelection()==true)
+                    {
+                        initFilterApplication();
+                    }
+                }
+                else
+                {
+                    initFilterApplication();
+                }
+                
+               
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProyectoFiltros.Clases;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -280,5 +281,190 @@ namespace ProyectoFiltros
             }
             saveImage(image);
         }
+
+
+        public void colorsBalance(Bitmap image)
+
+        {
+            Bitmap bmpNew = new Bitmap(image);
+
+            BitmapData bmpData = bmpNew.LockBits(new Rectangle(0, 0, bmpNew.Width, bmpNew.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+
+            IntPtr ptr = bmpData.Scan0;
+
+
+            byte[] byteBuffer = new byte[bmpData.Stride * bmpNew.Height];
+
+
+            Marshal.Copy(ptr, byteBuffer, 0, byteBuffer.Length);
+
+            int limit = byteBuffer.Length;
+
+            float blue, green, red;
+
+
+            for (int i = 0; i < limit; i += 4)
+            {
+               
+                blue = 255.0f / 147f * byteBuffer[i];
+                green = 255.0f / 150f * byteBuffer[i + 1];
+                red = 255.0f / 127f * byteBuffer[i + 2];
+
+                if (blue > 255)
+                {
+                    blue = 255;
+                }
+                else if (blue < 0)
+                {
+                    blue = 0;
+                }
+
+                if (green > 255)
+                {
+                    green = 255;
+                }
+                else if (green < 0)
+                {
+                    green = 0;
+                }
+
+                if (red > 255)
+                {
+                    red = 255;
+                }
+                else if (red < 0)
+                {
+                    red = 0;
+                }
+
+                byteBuffer[i] = (byte)blue;
+                byteBuffer[i + 1] = (byte)green;
+                byteBuffer[i + 2] = (byte)red;
+
+            }
+
+            Marshal.Copy(byteBuffer, 0, ptr, byteBuffer.Length);
+
+
+            bmpNew.UnlockBits(bmpData);
+
+            bmpData = null;
+            byteBuffer = null;
+
+            saveImage(bmpNew);
+
+            return;
+
+        }
+
+        public void colorSubstitution(Bitmap image, ColorSubstitutionFilter changer)
+        {
+
+            Bitmap bmpNew = new Bitmap(image);
+
+            BitmapData bmpData = bmpNew.LockBits(new Rectangle(0, 0, bmpNew.Width, bmpNew.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+
+            IntPtr ptr = bmpData.Scan0;
+
+
+            byte[] resultBuffer = new byte[bmpData.Stride * bmpNew.Height];
+
+
+            Marshal.Copy(ptr, resultBuffer, 0, resultBuffer.Length);
+
+            int limit = resultBuffer.Length;
+
+            //almacenamiento de variables temporales
+
+            byte sourceRed = 0, sourceGreen = 0, sourceBlue = 0, sourceAlpha = 0;
+            int resultRed = 0, resultGreen = 0, resultBlue = 0;
+
+            byte minValue = 0;
+            byte maxValue = 255;
+
+            Color sourceColor = changer.getSourceColor();
+
+            Color newColor = changer.getNewColor();
+
+            int colorThreshold = changer.getThreshold();
+
+            
+
+            for (int k = 0; k < limit; k += 4)
+            {
+                sourceAlpha = resultBuffer[k + 3];
+
+
+                if (sourceAlpha != 0)
+                {
+                    //obtener valores del pixel
+                    sourceBlue = resultBuffer[k];
+                    sourceGreen = resultBuffer[k + 1];
+                    sourceRed = resultBuffer[k + 2];
+
+
+                    if ((sourceBlue < sourceColor.B + colorThreshold &&
+                            sourceBlue > sourceColor.B - colorThreshold) &&
+
+
+                        (sourceGreen < sourceColor.G + colorThreshold &&
+                            sourceGreen > sourceColor.G - colorThreshold) &&
+
+
+                        (sourceRed < sourceColor.R + colorThreshold &&
+                            sourceRed > sourceColor.R - colorThreshold))
+                    {
+                        resultBlue = sourceColor.B - sourceBlue + newColor.B;
+
+
+                        if (resultBlue > maxValue)
+                        { resultBlue = maxValue; }
+                        else if (resultBlue < minValue)
+                        { resultBlue = minValue; }
+
+
+                        resultGreen = sourceColor.G - sourceGreen + newColor.G;
+
+
+                        if (resultGreen > maxValue)
+                        { resultGreen = maxValue; }
+                        else if (resultGreen < minValue)
+                        { resultGreen = minValue; }
+
+
+                        resultRed = sourceColor.R - sourceRed + newColor.R;
+
+
+                        if (resultRed > maxValue)
+                        { resultRed = maxValue; }
+                        else if (resultRed < minValue)
+                        { resultRed = minValue; }
+
+
+                        resultBuffer[k] = (byte)resultBlue;
+                        resultBuffer[k + 1] = (byte)resultGreen;
+                        resultBuffer[k + 2] = (byte)resultRed;
+                        resultBuffer[k + 3] = sourceAlpha;
+                    }
+                }
+            }
+
+            Marshal.Copy(resultBuffer, 0, ptr, resultBuffer.Length);
+
+
+            bmpNew.UnlockBits(bmpData);
+
+            bmpData = null;
+            resultBuffer = null;
+
+            saveImage(bmpNew);
+
+            return;
+
+
+        }
+
     }
 }
