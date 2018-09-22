@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace ProyectoFiltros.Clases
 {
-    class Connections
+    class ConnectionManager
     {
         string filterName;
         Bitmap bitmap; 
 
-        public Connections()
+        public ConnectionManager()
         {
+
         }
 
         public Bitmap applyFilter()
