@@ -23,14 +23,18 @@ namespace ProyectoFiltros.Clases
             image = bitmap;
             connectionAddress = connectionAdds; 
         }
-
+        /// <summary>
+        ///     Permite llamar al web service para aplicar el filtro 
+        /// </summary>
+        /// <returns>Rtorna la imagen procesada</returns>
         public async Task<Bitmap> applyFilterAsync()
-        {
+        {            
             var values = new Dictionary<string, string>
             {
-               { "thing1", "hello" },
+               { "id", "hello" },
                { "thing2", "world" }
             };
+
             var content = new FormUrlEncodedContent(values);
             var response = await client.PostAsync("http://www.example.com/recepticle.aspx", content);
             var responseString = await response.Content.ReadAsStringAsync();
