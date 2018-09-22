@@ -41,9 +41,9 @@ namespace ProyectoFiltros.Clases
                 //la cantidad de bytes constituidos unicamente por la anchura de la imagen, y el espacio en bytes que ocupa cada pixel
                 int widthInBytes = bitmapData.Width * bytesPerPixel;
 
-                byte* PtrFirstPixel = (byte*) bitmapData.Scan0; //obtener el primer byte (la primera línea) en el mapa de bits
+                byte* PtrFirstPixel = (byte*)bitmapData.Scan0; //obtener el primer byte (la primera línea) en el mapa de bits
 
-                
+
 
                 Parallel.For(0, heightInPixels, y =>
                 {
@@ -110,7 +110,7 @@ namespace ProyectoFiltros.Clases
                 byte* PtrFirstPixel = (byte*)bitmapData.Scan0; //obtener el primer byte (la primera línea) en el mapa de bits
 
 
-
+                //procesa una línea de pixeles (fila de matriz por cada iteración de parallell)
                 Parallel.For(0, heightInPixels, y =>
                 {
 
@@ -119,7 +119,7 @@ namespace ProyectoFiltros.Clases
                     for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
                     {
 
-                        currentLine[x] = (byte)((currentLine[x] + currentLine[x + 1] + currentLine[ x + 2]) / 3f);
+                        currentLine[x] = (byte)((currentLine[x] + currentLine[x + 1] + currentLine[x + 2]) / 3f);
                         currentLine[x + 1] = currentLine[x + 2] = currentLine[x];
 
                     }
@@ -139,7 +139,7 @@ namespace ProyectoFiltros.Clases
 
         public void GaussinBlurFilter(Bitmap image, Rectangle rectangle, int blurSize)
         {
-
+            /**
             Bitmap blurred = new Bitmap(image.Width, image.Height);
 
             // make an exact copy of the bitmap provided
@@ -147,13 +147,10 @@ namespace ProyectoFiltros.Clases
                 graphics.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height),
                     new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
 
-
-
-
-            // look at every pixel in the blur rectangle
-            for (int xx = rectangle.X; xx < rectangle.X + rectangle.Width; xx++)
+    
+            Parallel.For(rectangle.X, rectangle.X + rectangle.Width, xx =>
             {
-                for (int yy = rectangle.Y; yy < rectangle.Y + rectangle.Height; yy++)
+                Parallel.For(rectangle.Y, rectangle.Y + rectangle.Height, yy =>
                 {
                     int avgR = 0, avgG = 0, avgB = 0;
                     int blurPixelCount = 0;
@@ -161,7 +158,8 @@ namespace ProyectoFiltros.Clases
                     // average the color of the red, green and blue for each pixel in the
                     // blur size while making sure you don't go outside the image bounds
                     for (int x = xx; (x < xx + blurSize && x < image.Width); x++)
-                    {
+                   
+            {
                         for (int y = yy; (y < yy + blurSize && y < image.Height); y++)
                         {
                             Color pixel = blurred.GetPixel(x, y);
@@ -181,15 +179,36 @@ namespace ProyectoFiltros.Clases
                     // now that we know the average for the blur size, set each pixel to that color
                     for (int x = xx; x < xx + blurSize && x < image.Width && x < rectangle.Width; x++)
                         for (int y = yy; y < yy + blurSize && y < image.Height && y < rectangle.Height; y++)
+                            lock (blurred[xx][yy])
+                            {
+
+                            }
                             blurred.SetPixel(x, y, Color.FromArgb(avgR, avgG, avgB));
+
+
+                });
+
+            });
+
+            // look at every pixel in the blur rectangle
+            for (int xx = rectangle.X; xx < rectangle.X + rectangle.Width; xx++)
+            {
+                for (int yy = rectangle.Y; yy < rectangle.Y + rectangle.Height; yy++)
+                {
+                    
+
+                    
+
+                    
                 }
             }
 
 
 
             this.saveImage(blurred);
-        }
 
+            */
+        }
 
         public void colorsBalance(Bitmap imageBitMap)
         {
@@ -268,9 +287,124 @@ namespace ProyectoFiltros.Clases
             return;
         }
 
+        public void colorSubstitution(Bitmap imageBitmap, ColorSubstitutionFilter changer)
+        {
+            Bitmap image = new Bitmap(imageBitmap);
+
+            unsafe
+            {
+
+                BitmapData bitmapData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
+
+                //cantidad de bytes que tiene un pixel
+                int bytesPerPixel = System.Drawing.Bitmap.GetPixelFormatSize(image.PixelFormat) / 8;
+
+                int heightInPixels = bitmapData.Height;
+
+                //la cantidad de bytes constituidos unicamente por la anchura de la imagen, y el espacio en bytes que ocupa cada pixel
+                int widthInBytes = bitmapData.Width * bytesPerPixel;
+
+                byte* PtrFirstPixel = (byte*)bitmapData.Scan0; //obtener el primer byte (la primera línea) en el mapa de bits
+
+                //almacenamiento de variables temporales
+
+                byte minValue = 0;
+                byte maxValue = 255;
+
+                Color sourceColor = changer.getSourceColor();
+
+                Color newColor = changer.getNewColor();
+
+                int colorThreshold = changer.getThreshold();
 
 
+                Parallel.For(0, heightInPixels, y =>
+                {
+                    byte sourceRed, sourceGreen, sourceBlue, sourceAlpha;
+                    int resultRed = 0, resultGreen = 0, resultBlue = 0;
 
+                    byte* currentLine = PtrFirstPixel + (y * bitmapData.Stride);
+                    for (int x = 0; x < widthInBytes; x = x + bytesPerPixel)
+                    {
+                        sourceAlpha = currentLine[x + 3];
+
+                        if (sourceAlpha != 0)
+                        {
+                            //obtener valores del pixel
+                            sourceBlue = currentLine[x];
+                            sourceGreen = currentLine[x + 1];
+                            sourceRed = currentLine[x + 2];
+
+
+                            if ((sourceBlue < sourceColor.B + colorThreshold &&
+                                    sourceBlue > sourceColor.B - colorThreshold) &&
+
+
+                                (sourceGreen < sourceColor.G + colorThreshold &&
+                                    sourceGreen > sourceColor.G - colorThreshold) &&
+
+
+                                (sourceRed < sourceColor.R + colorThreshold &&
+                                    sourceRed > sourceColor.R - colorThreshold))
+                            {
+                                resultBlue = sourceColor.B - sourceBlue + newColor.B;
+
+
+                                if (resultBlue > maxValue)
+                                {
+                                    resultBlue = maxValue;
+                                }
+                                else if (resultBlue < minValue)
+                                {
+                                    resultBlue = minValue;
+                                }
+
+
+                                resultGreen = sourceColor.G - sourceGreen + newColor.G;
+
+
+                                if (resultGreen > maxValue)
+                                {
+                                    resultGreen = maxValue;
+                                }
+                                else if (resultGreen < minValue)
+                                {
+                                    resultGreen = minValue;
+                                }
+
+
+                                resultRed = sourceColor.R - sourceRed + newColor.R;
+
+
+                                if (resultRed > maxValue)
+                                {
+                                    resultRed = maxValue;
+                                }
+                                else if (resultRed < minValue)
+                                {
+                                    resultRed = minValue;
+                                }
+
+
+                                currentLine[x] = (byte)resultBlue;
+                                currentLine[x + 1] = (byte)resultGreen;
+                                currentLine[x + 2] = (byte)resultRed;
+                                currentLine[x + 3] = sourceAlpha;
+                            }
+                        }
+
+
+                    }
+
+                });
+
+                image.UnlockBits(bitmapData);
+
+                saveImage(image);
+            }
+
+            return;
+        }
 
     }
 }

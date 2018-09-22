@@ -396,7 +396,6 @@ namespace ProyectoFiltros
             {
                 sourceAlpha = resultBuffer[k + 3];
 
-
                 if (sourceAlpha != 0)
                 {
                     //obtener valores del pixel

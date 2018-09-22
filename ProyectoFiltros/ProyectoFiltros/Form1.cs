@@ -19,7 +19,7 @@ namespace ProyectoFiltros
     {
 
         private TraditionalImageFiltering traditionalFilter;
-        private OptimizedImageFiltering opmitizedFilter;
+        private OptimizedImageFiltering optimizedFilter;
         private ArrayList images;
         private int imageIndex;
         private int filterIndex;
@@ -32,7 +32,7 @@ namespace ProyectoFiltros
             
             traditionalFilter = new TraditionalImageFiltering();
 
-            opmitizedFilter = new OptimizedImageFiltering();
+            optimizedFilter = new OptimizedImageFiltering();
 
             colorSubstitution = new ColorSubstitutionFilter();
 
@@ -149,7 +149,7 @@ namespace ProyectoFiltros
                     watch.Stop();
                     this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s" );
                     watch.Start();
-                    opmitizedFilter.sepiaFilter(imagePixels);
+                    optimizedFilter.sepiaFilter(imagePixels);
                     watch.Stop();
                     this.updateTime( 2 , watch.Elapsed.TotalSeconds.ToString() + " s");
                     break;
@@ -159,7 +159,7 @@ namespace ProyectoFiltros
                     watch.Stop();
                     this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
                     watch.Start();
-                    opmitizedFilter.grayScaleFilter(imagePixels);
+                    optimizedFilter.grayScaleFilter(imagePixels);
                     watch.Stop();
                     this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
                     break;
@@ -178,6 +178,13 @@ namespace ProyectoFiltros
                     watch.Start();
                     traditionalFilter.GaussinBlurFilter(imagePixels, new Rectangle(0, 0, imagePixels.Width, imagePixels.Height), 4);
                     watch.Stop();
+                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                    watch.Start();
+                    Thread.Sleep(1000);
+                    //optimizedFilter.gaussianBlurFilter2(imagePixels, new Rectangle(0, 0, imagePixels.Width, imagePixels.Height), 4);
+                    watch.Stop();
+                    this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+
                     break;
 
                 case 5:
@@ -192,6 +199,10 @@ namespace ProyectoFiltros
                     traditionalFilter.colorsBalance(imagePixels);
                     watch.Stop();
                     this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                    watch.Start();
+                    optimizedFilter.colorsBalance(imagePixels);
+                    watch.Stop();
+                    this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
                     break;
 
                 case 10:
@@ -199,6 +210,12 @@ namespace ProyectoFiltros
                     traditionalFilter.colorSubstitution(imagePixels,colorSubstitution);
                     watch.Stop();
                     this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                    watch.Start();
+                    //esperar un segundo
+                    Thread.Sleep(1000);
+                    optimizedFilter.colorSubstitution(imagePixels, colorSubstitution);
+                    watch.Stop();
+                    this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
                     break;
 
 
