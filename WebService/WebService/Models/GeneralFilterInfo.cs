@@ -16,4 +16,5 @@ namespace WebService.Models
         public string image { get; set; }
         public string filterName { get; set; }
     }
+
 }
