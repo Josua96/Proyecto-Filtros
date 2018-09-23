@@ -6,31 +6,52 @@ namespace ProyectoFiltros
 {
     public partial class Form2 : Form
     {
-        public PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
-        public Timer t = new Timer();
 
         public Form2()
         {
             InitializeComponent();
-            label3.Text = CPUCounter.NextValue() + "%";
-            t.Interval = 750;
-            t.Enabled = true;
-            timer1_Tick(null, null);
-
-            t.Tick += new EventHandler(timer1_Tick);
-
+            setCores();
         }
 
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            Console.WriteLine("a");
-            label3.Text = CPUCounter.NextValue() + "%";
+        private void setCores() {
+            int coreCount = Environment.ProcessorCount;
+            for (int i = 0; i < coreCount; i++)
+            {
+                coreList.Items.Add(i + 1);
+            }
+            label3.Text = Process.GetCurrentProcess().ProcessorAffinity + "";
         }
 
-       
-        private void Form2_FormClosing(object sender, FormClosingEventArgs e)
+        private void changeForm_Click(object sender, EventArgs e)
         {
-            t.Dispose();
+            this.Hide();
+            var v = new Form1();
+            v.Closed += (s, args) => this.Close();
+            v.Show();
+        }
+
+        private void coreList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (coreList.SelectedIndex + 1)
+            {
+                case 1:
+                    Process.GetCurrentProcess().ProcessorAffinity = (System.IntPtr)1;
+                    break;
+                case 2:
+                    Process.GetCurrentProcess().ProcessorAffinity = (System.IntPtr)3;
+                    break;
+                case 3:
+                    Process.GetCurrentProcess().ProcessorAffinity = (System.IntPtr)7;
+                    break;
+                case 4:
+                    Process.GetCurrentProcess().ProcessorAffinity = (System.IntPtr)9;
+                    break;
+                default:
+                    Process.GetCurrentProcess().ProcessorAffinity = (System.IntPtr)127;
+                    break;
+            }
+            label3.Text = Process.GetCurrentProcess().ProcessorAffinity + "";
+
         }
     }
 }

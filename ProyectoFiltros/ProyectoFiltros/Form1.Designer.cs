@@ -44,9 +44,10 @@
             this.traditionalMethod = new System.Windows.Forms.Label();
             this.optimizedMethod = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.simpleModeB = new System.Windows.Forms.RadioButton();
             this.distributedModeB = new System.Windows.Forms.RadioButton();
-            this.infoConfig = new System.Windows.Forms.Button();
+            this.simpleModeB = new System.Windows.Forms.RadioButton();
+            this.label5 = new System.Windows.Forms.Label();
+            this.CPUusage = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.imageContainer)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -58,7 +59,6 @@
             this.availableFilters.Name = "availableFilters";
             this.availableFilters.Size = new System.Drawing.Size(130, 21);
             this.availableFilters.TabIndex = 0;
-            this.availableFilters.SelectedIndexChanged += new System.EventHandler(this.availableFilters_SelectedIndexChanged);
             this.availableFilters.SelectionChangeCommitted += new System.EventHandler(this.availableFilters_SelectionChangeCommitted);
             // 
             // applyFilter
@@ -209,17 +209,6 @@
             this.groupBox2.TabIndex = 18;
             this.groupBox2.TabStop = false;
             // 
-            // simpleModeB
-            // 
-            this.simpleModeB.AutoSize = true;
-            this.simpleModeB.Location = new System.Drawing.Point(29, 7);
-            this.simpleModeB.Name = "simpleModeB";
-            this.simpleModeB.Size = new System.Drawing.Size(84, 17);
-            this.simpleModeB.TabIndex = 0;
-            this.simpleModeB.TabStop = true;
-            this.simpleModeB.Text = "Modo simple";
-            this.simpleModeB.UseVisualStyleBackColor = true;
-            // 
             // distributedModeB
             // 
             this.distributedModeB.AutoSize = true;
@@ -231,15 +220,34 @@
             this.distributedModeB.Text = "Modo distribuido";
             this.distributedModeB.UseVisualStyleBackColor = true;
             // 
-            // infoConfig
+            // simpleModeB
             // 
-            this.infoConfig.Location = new System.Drawing.Point(915, 3);
-            this.infoConfig.Name = "infoConfig";
-            this.infoConfig.Size = new System.Drawing.Size(119, 32);
-            this.infoConfig.TabIndex = 19;
-            this.infoConfig.Text = "Información";
-            this.infoConfig.UseVisualStyleBackColor = true;
-            this.infoConfig.Click += new System.EventHandler(this.infoConfig_Click);
+            this.simpleModeB.AutoSize = true;
+            this.simpleModeB.Location = new System.Drawing.Point(29, 7);
+            this.simpleModeB.Name = "simpleModeB";
+            this.simpleModeB.Size = new System.Drawing.Size(84, 17);
+            this.simpleModeB.TabIndex = 0;
+            this.simpleModeB.TabStop = true;
+            this.simpleModeB.Text = "Modo simple";
+            this.simpleModeB.UseVisualStyleBackColor = true;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(12, 470);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(74, 13);
+            this.label5.TabIndex = 20;
+            this.label5.Text = "Uso del CPU: ";
+            // 
+            // CPUusage
+            // 
+            this.CPUusage.AutoSize = true;
+            this.CPUusage.Location = new System.Drawing.Point(92, 470);
+            this.CPUusage.Name = "CPUusage";
+            this.CPUusage.Size = new System.Drawing.Size(35, 13);
+            this.CPUusage.TabIndex = 21;
+            this.CPUusage.Text = "label6";
             // 
             // Form1
             // 
@@ -249,7 +257,8 @@
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(1036, 495);
-            this.Controls.Add(this.infoConfig);
+            this.Controls.Add(this.CPUusage);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.optimizedMethod);
             this.Controls.Add(this.traditionalMethod);
@@ -268,6 +277,7 @@
             this.Controls.Add(this.availableFilters);
             this.Name = "Form1";
             this.Text = "MainView";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.imageContainer)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
@@ -296,7 +306,8 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.RadioButton distributedModeB;
         private System.Windows.Forms.RadioButton simpleModeB;
-        private System.Windows.Forms.Button infoConfig;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label CPUusage;
     }
 }
 

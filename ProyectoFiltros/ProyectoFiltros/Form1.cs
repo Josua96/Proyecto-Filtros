@@ -18,7 +18,11 @@ namespace ProyectoFiltros
         private int imageIndex;
         private int filterIndex;
         private ColorSubstitutionFilter colorSubstitution;
-        private ConnectionManager ConnectionManager; 
+        private ConnectionManager ConnectionManager;
+
+        private PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+        private System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
+
         public Form1()
         {
             InitializeComponent();
@@ -34,6 +38,18 @@ namespace ProyectoFiltros
             availableFilters.SelectedIndex = 0;
             imageContainer.SizeMode = PictureBoxSizeMode.StretchImage;
 
+            CPUusage.Text = CPUCounter.NextValue() + "%";
+            t.Interval = 750;
+            t.Enabled = true;
+            timer1_Tick(null, null);
+
+            t.Tick += new EventHandler(timer1_Tick);
+
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            CPUusage.Text = CPUCounter.NextValue() + "%";
         }
 
         private void setFiltersType()
@@ -418,29 +434,11 @@ namespace ProyectoFiltros
 
             }
         }
-
-        private void infoConfig_Click(object sender, EventArgs e)
+        
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Form2 modal = new Form2();
-            int coreCount = 0;
-            foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_Processor").Get())
-            {
-                coreCount = int.Parse(item["NumberOfCores"].ToString());
-            }
-            for(int i=0; i < coreCount; i++)
-            {
-                ((ComboBox) modal.Controls[0]).Items.Add(i+1);
-            }
-            modal.Show();
+            t.Dispose();
+            
         }
-
-<<<<<<< HEAD
-       
-=======
-        private void availableFilters_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
->>>>>>> master
     }
 }
