@@ -391,13 +391,18 @@ namespace ProyectoFiltros
         private void infoConfig_Click(object sender, EventArgs e)
         {
             Form2 modal = new Form2();
-            Console.WriteLine(modal.Controls.Find("label3",false));
-            /*int coreCount = 0;
+            int coreCount = 0;
             foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_Processor").Get())
             {
-                modal.Controls.Add( item["NumberOfCores"].ToString());
-            }*/
+                coreCount = int.Parse(item["NumberOfCores"].ToString());
+            }
+            for(int i=0; i < coreCount; i++)
+            {
+                ((ComboBox) modal.Controls[0]).Items.Add(i+1);
+            }
             modal.Show();
         }
+
+       
     }
 }
