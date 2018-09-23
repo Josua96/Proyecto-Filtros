@@ -17,6 +17,12 @@ namespace WebService.Models
             imageManager = new ImageManager();
         }
 
+        /// <summary>
+        /// Aplica un filtro general sobre una imagen
+        /// </summary>
+        /// <param name="filter"> El nombre del filtro a aplicar </param>
+        /// <param name="imageData"> El string en base64 de la imagen </param>
+        /// <returns>Un string en base64 que corresponde a la imagen con el filtro aplicado</returns>
         public string applyFilter(string filter, string imageData)
         {
             Image image = imageManager.decodeImage(imageData);
@@ -30,7 +36,7 @@ namespace WebService.Models
                     break;
 
                 case "GrayScale":
-                    imageInformation = grayScale(imagePixels);
+                    imageInformation = imageManager.encodeImage(grayScale(imagePixels));
                     break;
 
                 case "GaussianBlur":
@@ -42,16 +48,35 @@ namespace WebService.Models
                     imageInformation = colorsBalance(imagePixels);
                     break;
 
-                default:
+                case "InvertColors":
+                    
                     imageInformation = invertColors(imagePixels);
+                    break;
+
+                case "SolariseFilter":
+                    imageInformation = solariseFilter(imagePixels, 25, 40, 52);
+                    break;
+
+                case "EdgeDetection":
+                    imageInformation = EdgeFilter(imagePixels);
+                    break;
+
+                default:
                     break;
             }
 
             return imageInformation;
         }
 
-        
-        public string applyFilter(string filter, string imageData, double paramValue)
+
+        /// <summary>
+        /// Aplica un filtro sobre una imagen, el filtro requiere de un parametro
+        /// </summary>
+        /// <param name="filter"> Nombre del filtro a aplicar</param>
+        /// <param name="imageData"> String en base64 que corresponde a la imagen a procesar</param>
+        /// <param name="paramValue"> Valor que utiliza el filtro para modificar los pixeles</param>
+        /// <returns></returns>
+        public string applyOneParamFilter(string filter, string imageData, double paramValue)
         {
             Image image = imageManager.decodeImage(imageData);
             string imageInformation = "";
@@ -59,19 +84,65 @@ namespace WebService.Models
             switch (filter)
             {
                 case "Opacity":
+                    Console.WriteLine("Filtro opacidad");
                     imageInformation = opacity(imagePixels,paramValue);
                     break;
 
+                case "Bright":
+                    Console.WriteLine("Filtro brillo");
+                    imageInformation = bright(imagePixels, paramValue);
+                    break;
+
+                case "CrudeHighPass":
+                    imageInformation = CrudeHighPass(imagePixels, Convert.ToInt32(Math.Ceiling(paramValue)));
+                    break;
+
                 default:
-                    imageInformation = invertColors(imagePixels);
                     break;
             }
 
             return imageInformation;
         }
 
+        /// <summary>
+        /// Filtro que dado un valor, promedia rgb de cada pixel y si el promedio es menor
+        /// a threshold el color del pixel pasa a negro
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="threshold"></param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
+        public string CrudeHighPass(Bitmap image, int threshold)
+        {
+            
+            int width = image.Width;
+            int height = image.Height;
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y= 0; y < height; y++)
+                {
+                    Color pixel = image.GetPixel(x,y);
+
+                    int nowPixel= (pixel.R +pixel.G+pixel.B)/3;
+                
+                    if ( nowPixel <= threshold)
+                    {
+                        image.SetPixel(x, y, Color.Black);
+                    }
+                }
+            }
+            return imageManager.encodeImage(image);
+        }
+
+
+        /// <summary>
+        /// Controla la aplición del filtro de remplazo de color
+        /// </summary>
+        /// <param name="filterInfo"> Objeto que contiene los datos que el filtro requiere para operar</param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
         public string applyColorSubstitution(ChangeColorInfo filterInfo)
         {
+            
             Image image = imageManager.decodeImage(filterInfo.image);
             Bitmap imagePixels = new Bitmap(image);
 
@@ -79,8 +150,23 @@ namespace WebService.Models
 
         }
 
+        /// <summary>
+        /// Remplaza un pixel por uno que tiene el nuevo color especificado, la similitud entre un pixel
+        /// y el color a remplazar tiene un grado de tolerancia que posee threshold.
+        /// 
+        /// </summary>
+        /// <param name="image"> Mapa de bits de la imagen a procesar</param>
+        /// <param name="filterInfo">Objeto con la información que requiere el filtro(viejo color,nuevo color, threshold)</param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
         public string colorSubstitution(Bitmap image, ChangeColorInfo filterInfo)
         {
+
+            string[] colorInfo = filterInfo.oldColor.Split(',');
+
+            Color sourceColor = Color.FromArgb(Convert.ToInt32(colorInfo[0]), Convert.ToInt32(colorInfo[1]), Convert.ToInt32(colorInfo[2]), Convert.ToInt32(colorInfo[3]));
+
+            colorInfo= filterInfo.newColor.Split(',');
+            Color newColor = Color.FromArgb(Convert.ToInt32(colorInfo[0]), Convert.ToInt32(colorInfo[1]), Convert.ToInt32(colorInfo[2]), Convert.ToInt32(colorInfo[3]));
 
             Bitmap bmpNew = new Bitmap(image);
 
@@ -105,11 +191,9 @@ namespace WebService.Models
             byte minValue = 0;
             byte maxValue = 255;
 
-            Color sourceColor = filterInfo.oldColor;
+            
 
-            Color newColor = filterInfo.newColor;
-
-            int colorThreshold = filterInfo.threshold;
+            int colorThreshold = Convert.ToInt32(filterInfo.threshold.ToString());
 
 
 
@@ -184,6 +268,12 @@ namespace WebService.Models
 
         }
 
+        /// <summary>
+        /// Aplica filtro de opacidad a una imagen
+        /// </summary>
+        /// <param name="bmp"> Mapa de bits de la imagen</param>
+        /// <param name="opacity"> Grado de opacidad a aplicar a la imagen</param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
         private string opacity(Bitmap bmp, double opacity)
         {
             const int bytesPerPixel = 4;
@@ -236,6 +326,12 @@ namespace WebService.Models
 
         }
 
+        /// <summary>
+        /// Aplicaca filtro de brillo a una imagen
+        /// </summary>
+        /// <param name="image"> Mapa de bits de la imagen a procesar</param>
+        /// <param name="bright">Grado de brillo a aplicar</param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
         private string bright(Bitmap image, double bright)
         {
             Rectangle rect = new Rectangle(0, 0, image.Width, image.Height);
@@ -269,6 +365,11 @@ namespace WebService.Models
 
         }
 
+        /// <summary>
+        /// Aplica filtro de sepia a una imagen
+        /// </summary>
+        /// <param name="image"> Mapa de bits de la imagen a procesar </param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
         private string sepia(Bitmap image)
         {
             Bitmap bmpNew = new Bitmap(image);
@@ -328,7 +429,12 @@ namespace WebService.Models
 
         }
 
-        private string grayScale(Bitmap image)
+        /// <summary>
+        /// Aplica filtro de escala de grises a la imagen
+        /// </summary>
+        /// <param name="image">Mapa de bits de la imagen a procesar</param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
+        private Bitmap grayScale(Bitmap image)
         {
             Bitmap bmpNew = new Bitmap(image);
 
@@ -362,9 +468,17 @@ namespace WebService.Models
             bmpData = null;
             byteBuffer = null;
 
-            return imageManager.encodeImage(bmpNew);
+            return bmpNew;
         }
 
+
+        /// <summary>
+        /// Aplica filtro de deenfoque a una imagen
+        /// </summary>
+        /// <param name="image"> Mapa de bits de la imagen a procesar</param>
+        /// <param name="rectangle"> Un rectángulo cuyas dimensiones corresponden a la altura y anchura de la image </param>
+        /// <param name="blurSize">Grado de desenfoque que se aplicará a la imagen</param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
         private string gaussianBlur(Bitmap image, Rectangle rectangle, int blurSize)
         {
             Bitmap blurred = new Bitmap(image.Width, image.Height);
@@ -416,6 +530,11 @@ namespace WebService.Models
 
         }
 
+        /// <summary>
+        /// Aplica filtro de inversión de colores a una imagen
+        /// </summary>
+        /// <param name="image"> Mapa de bits de la imagen a procesar </param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
         private string invertColors(Bitmap image)
         {
             for (int y = 0; (y <= (image.Height - 1)); y++)
@@ -430,6 +549,11 @@ namespace WebService.Models
             return imageManager.encodeImage(image);
         }
 
+        /// <summary>
+        /// Aplicado filtro de balance de colores a una imagen
+        /// </summary>
+        /// <param name="image"> Mapa de bits de la imagen a procesar</param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
         private string colorsBalance(Bitmap image)
         {
             Bitmap bmpNew = new Bitmap(image);
@@ -501,6 +625,120 @@ namespace WebService.Models
             return imageManager.encodeImage(bmpNew);
         }
 
+        /// <summary>
+        /// Aplica filtro de solarizado a una imagen
+        /// </summary>
+        /// <param name="sourceBitmap"> Mapa de bits de la imagen a procesar </param>
+        /// <param name="blueValue"> Límite menor de azul permitido</param>
+        /// <param name="greenValue"> Límite menor de verde permitido </param>
+        /// <param name="redValue"> Límite menor de rojo permitido </param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
+        public string solariseFilter(Bitmap sourceBitmap, byte blueValue, byte greenValue, byte redValue)
+        {
+            BitmapData sourceData = sourceBitmap.LockBits(new Rectangle(0, 0,
+                                    sourceBitmap.Width, sourceBitmap.Height),
+                                    ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+
+            byte[] pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+
+
+            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
+
+
+            sourceBitmap.UnlockBits(sourceData);
+
+
+            byte byte255 = 255;
+
+
+            for (int k = 0; k < pixelBuffer.Length; k += 4)
+            {
+                if (pixelBuffer[k] < blueValue)
+                {
+                    pixelBuffer[k] = (byte)(byte255 - pixelBuffer[k]);
+                }
+
+
+                if (pixelBuffer[k + 1] < greenValue)
+                {
+                    pixelBuffer[k + 1] = (byte)(byte255 - pixelBuffer[k + 1]);
+                }
+
+
+                if (pixelBuffer[k + 2] < redValue)
+                {
+                    pixelBuffer[k + 2] = (byte)(byte255 - pixelBuffer[k + 2]);
+                }
+            }
+
+
+            Bitmap resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+
+            BitmapData resultData = resultBitmap.LockBits(new Rectangle(0, 0,
+                                     resultBitmap.Width, resultBitmap.Height),
+                                     ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+
+            Marshal.Copy(pixelBuffer, 0, resultData.Scan0, pixelBuffer.Length);
+            resultBitmap.UnlockBits(resultData);
+
+            return imageManager.encodeImage(resultBitmap);
+
+        }
+
+        /// <summary>
+        /// Aplica el filtro de detección de bordes a una imagen
+        /// </summary>
+        /// <param name="image">Mapa de bits de la imagen a procesar</param>
+        /// <returns>String en base 64 una vez que el filtro fue aplicado</returns>
+        public string EdgeFilter(Bitmap image)
+        {
+            Bitmap grayImage = grayScale(image);
+            int[][] xs = new int[3][];
+            xs[0] = new int[3] { -1, 0, 1 };
+            xs[1] = new int[3] { -2, 0, 2 };
+            xs[2] = new int[3] { -1, 0, 1 };
+
+            int[][] ys = new int[3][];
+            ys[0] = new int[3] { 1, 2, 1 };
+            ys[1] = new int[3] { 0, 0, 0 };
+            ys[2] = new int[3] { -1, -2, -1 };
+
+            Bitmap result = new Bitmap(image);
+            for (int x = 1; x < image.Width - 2; x++)
+            {
+                for (int y = 1; y < image.Height - 2; y++)
+                {
+                    int pixelColorXS = (xs[0][0] * grayImage.GetPixel(x - 1, y - 1).R) + (xs[0][1] * grayImage.GetPixel(x, y - 1).R) + (xs[0][2] * grayImage.GetPixel(x + 1, y - 1).R) +
+                                       (xs[1][0] * grayImage.GetPixel(x - 1, y).R) + (xs[1][1] * grayImage.GetPixel(x, y).R) + (xs[1][2] * grayImage.GetPixel(x + 1, y).R) +
+                                       (xs[2][0] * grayImage.GetPixel(x - 1, y + 1).R) + (xs[2][1] * grayImage.GetPixel(x, y + 1).R) + (xs[2][2] * grayImage.GetPixel(x + 1, y + 1).R);
+
+                    int pixelColorYS = (ys[0][0] * grayImage.GetPixel(x - 1, y - 1).R) + (ys[0][1] * grayImage.GetPixel(x, y - 1).R) + (ys[0][2] * grayImage.GetPixel(x + 1, y - 1).R) +
+                                    (ys[1][0] * grayImage.GetPixel(x - 1, y).R) + (ys[1][1] * grayImage.GetPixel(x, y).R) + (ys[1][2] * grayImage.GetPixel(x + 1, y).R) +
+                                    (ys[2][0] * grayImage.GetPixel(x - 1, y + 1).R) + (ys[2][1] * grayImage.GetPixel(x, y + 1).R) + (ys[2][2] * grayImage.GetPixel(x + 1, y + 1).R);
+
+                    int pixelVa1 = (int)Math.Sqrt((pixelColorXS * pixelColorXS));
+                    int pixelVa2 = (int)Math.Sqrt((pixelColorYS * pixelColorYS));
+
+                    if (pixelVa1 > 50)
+                    {
+                        result.SetPixel(x, y, Color.White);
+                    }
+                    else if (pixelVa2 > 50)
+                    {
+                        result.SetPixel(x, y, Color.White);
+                    }
+                    else
+                    {
+                        result.SetPixel(x, y, Color.Black);
+                    }
+                }
+            }
+
+            return imageManager.encodeImage(result);
+
+        }
 
     }
 
