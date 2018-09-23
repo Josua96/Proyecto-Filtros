@@ -25,8 +25,7 @@ namespace WebService.Controllers
             switch (Request.HttpMethod)
             {
                 case "POST":
-                    return Json(new { Error= false , id= filterInfo.id, imageData=filterManager.applyFilter
-                                                                    (filterInfo.filterName, filterInfo.image)});
+                    return Json(new { Error= false , id= filterInfo.id, imageData=filterManager.applyFilter(filterInfo.filterName, filterInfo.image)});
             }
             return Json(new { Error = true, Message = "Operación HTTP desconocida" });
         }
