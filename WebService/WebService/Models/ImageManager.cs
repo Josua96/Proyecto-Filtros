@@ -8,6 +8,11 @@ using System.Web;
 
 namespace WebService.Models
 {
+
+    /// <summary>
+    /// Convierte de un string en base64 a imagen
+    /// Converite una imagen a string en base 64
+    /// </summary>
     public class ImageManager
     {
 
@@ -16,6 +21,11 @@ namespace WebService.Models
 
         }
 
+        /// <summary>
+        /// Convierte una imagen a string en base 64
+        /// </summary>
+        /// <param name="image"> Mapa de bits (pixeles) de la imagen a convertir</param>
+        /// <returns> Imagen representada como un string en base64</returns>
         public string encodeImage(Bitmap image)
         {
 
@@ -27,51 +37,14 @@ namespace WebService.Models
                     return Convert.ToBase64String(ms.GetBuffer()); //Get Base64
                 }
             }
-            /*
-            using (MemoryStream ms = new MemoryStream())
-            {
-                // Convert Image to byte[]
-                image.Save(ms,ImageFormat.Jpeg);
-                byte[] imageBytes = ms.ToArray();
-
-                // Convert byte[] to Base64 String
-                string base64String = Convert.ToBase64String(imageBytes);
-                return base64String;
-            }
-
-            */
-
-
-            /*
-             
-            using (var ms = new MemoryStream())
-            {
-                using (var bitmap = new Bitmap(bitMapImage))
-                {
-                    bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-                    return Convert.ToBase64String(ms.GetBuffer()); //Get Base64
-                }
-            }
-
-            */
-
-            /*
-
-            byte[] imageBytes = Convert.FromBase64String(image);
-            //Image image;
-
-            using (var ms = new MemoryStream(imageBytes, 0, imageBytes.Length))
-            {
-                image = Image.FromStream(ms, true);
-
-                Bitmap result = applyFilterAux(imageToFilter, image);//
-                return encodeBase64String(result);
-            }
-
-            */
-
+          
         } 
 
+        /// <summary>
+        /// Convierte un string en base64 a una imagen
+        /// </summary>
+        /// <param name="base64Image"></param>
+        /// <returns> La imagen que representa el string en base 64</returns>
         public Image decodeImage(string base64Image)
         {
             byte[] imageBytes = Convert.FromBase64String(base64Image);

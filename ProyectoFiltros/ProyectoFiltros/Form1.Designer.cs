@@ -209,6 +209,18 @@
             this.groupBox2.TabIndex = 18;
             this.groupBox2.TabStop = false;
             // 
+            // simpleModeB
+            // 
+            this.simpleModeB.AutoSize = true;
+            this.simpleModeB.Checked = true;
+            this.simpleModeB.Location = new System.Drawing.Point(29, 7);
+            this.simpleModeB.Name = "simpleModeB";
+            this.simpleModeB.Size = new System.Drawing.Size(84, 17);
+            this.simpleModeB.TabIndex = 0;
+            this.simpleModeB.TabStop = true;
+            this.simpleModeB.Text = "Modo simple";
+            this.simpleModeB.UseVisualStyleBackColor = true;
+            // 
             // distributedModeB
             // 
             this.distributedModeB.AutoSize = true;
@@ -220,27 +232,7 @@
             this.distributedModeB.Text = "Modo distribuido";
             this.distributedModeB.UseVisualStyleBackColor = true;
             // 
-            // simpleModeB
-            // 
-            this.simpleModeB.AutoSize = true;
-            this.simpleModeB.Location = new System.Drawing.Point(29, 7);
-            this.simpleModeB.Name = "simpleModeB";
-            this.simpleModeB.Size = new System.Drawing.Size(84, 17);
-            this.simpleModeB.TabIndex = 0;
-            this.simpleModeB.TabStop = true;
-            this.simpleModeB.Text = "Modo simple";
-            this.simpleModeB.UseVisualStyleBackColor = true;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 470);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(74, 13);
-            this.label5.TabIndex = 20;
-            this.label5.Text = "Uso del CPU: ";
-            // 
-            // CPUusage
+            // infoConfig
             // 
             this.CPUusage.AutoSize = true;
             this.CPUusage.Location = new System.Drawing.Point(92, 470);

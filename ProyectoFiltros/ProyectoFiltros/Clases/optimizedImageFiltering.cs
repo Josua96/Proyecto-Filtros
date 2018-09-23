@@ -120,7 +120,6 @@ namespace ProyectoFiltros.Clases
 
                         currentLine[x] = (byte)((currentLine[x] + currentLine[x + 1] + currentLine[x + 2]) / 3f);
                         currentLine[x + 1] = currentLine[x + 2] = currentLine[x];
-
                     }
                 });
 

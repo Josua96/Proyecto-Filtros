@@ -18,15 +18,17 @@ namespace ProyectoFiltros
         private int imageIndex;
         private int filterIndex;
         private ColorSubstitutionFilter colorSubstitution;
-        private ConnectionManager ConnectionManager;
-
         private PerformanceCounter CPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
         private System.Windows.Forms.Timer t = new System.Windows.Forms.Timer();
-
+        private ConnectionManager ConnectionManager;
+        List<string> servers = new List<string>();
         public Form1()
         {
             InitializeComponent();
-            
+            servers.Add("http://172.24.65.181:89/ImageProcessingWebService");
+            servers.Add("http://172.24.65.181:89/ImageProcessingWebService");
+            servers.Add("http://172.24.65.181:89/ImageProcessingWebService");
+
             traditionalFilter = new TraditionalImageFiltering();
             this.ConnectionManager = new ConnectionManager();
             optimizedFilter = new OptimizedImageFiltering();
@@ -62,10 +64,11 @@ namespace ProyectoFiltros
             availableFilters.Items.Add("Ajuste de brillo");
             availableFilters.Items.Add("Balance de colores");
             availableFilters.Items.Add("Remplazo de color");
-            availableFilters.Items.Add("Mediana");
-            availableFilters.Items.Add("Solarizado");
-            availableFilters.Items.Add("Pintura de aceite");
+            availableFilters.Items.Add("Oscurecer");
             availableFilters.Items.Add("Bordes");
+
+            availableFilters.Items.Add("Solarizado");
+            availableFilters.Items.Add("Mediana");            
         }
 
         private void setImages(string[] imageNames)
@@ -91,9 +94,7 @@ namespace ProyectoFiltros
 
             if (fileExplorer.ShowDialog() == DialogResult.OK)
             {
-
                 this.setImages(fileExplorer.FileNames);
-
             }
         }
 
@@ -144,30 +145,13 @@ namespace ProyectoFiltros
 
         private void filterTypeImage()
         {
-            
-            if (simpleModeB.Checked)
-            {
-                MessageBox.Show("Aplicando filtro", "Notificación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                simpleMode();
-            }
-            else if (distributedModeB.Checked)
-            {
-                MessageBox.Show("Todavia no se puede aplicar un filtro", "Notificación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            else
-            {
-                MessageBox.Show("Debe seleccionar un modo de ejecución", "Notificación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-            
-        }
-
-        private void simpleMode()
-        {
-
+            MessageBox.Show("Aplicando filtro", "Notificación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             Bitmap imagePixels = new Bitmap(imageContainer.Image);
-
             Stopwatch watch = new Stopwatch();
-            bool local = true;
+            bool local = simpleModeB.Checked;
+            updateTime(0," ");
+            updateTime(1," ");
+
             if (local)
             {
                 switch (filterIndex)
@@ -328,27 +312,163 @@ namespace ProyectoFiltros
                         watch.Start();
                         ConnectionManager.FilterName = "Sepia";
                         ConnectionManager.Bitmap = imagePixels;
-                        List<string> servers = new List<string>();
-                        servers.Add("http://172.24.107.139:89/ImageProcessingWebService/ApplyGeneralFilter");
-                        servers.Add("http://172.24.107.139:89/ImageProcessingWebService/ApplyGeneralFilter");
-                        servers.Add("http://172.24.107.139:89/ImageProcessingWebService/ApplyGeneralFilter");
-                        servers.Add("http://172.24.107.139:89/ImageProcessingWebService/ApplyGeneralFilter");
-
-                        ConnectionManager.AddConnections(servers);  // recorreria una lista de conecciones (dadas por el usuario)
+                        ConnectionManager.AddConnections(servers);
                         ConnectionManager.ApplyFilter();
                         watch.Stop();
                         this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;
+                    case 1:
+                        watch.Start();
+                        ConnectionManager.FilterName = "GrayScale";
+                        ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
+                    case 2: // Hay que ponerle el parametro
+                        double opacityValue = 0;
+                        try
+                        {
+                            opacityValue = double.Parse(filterPercentage.Text);
+                            if (opacityValue <= 0 || opacityValue > 255)
+                            {
+                                MessageBox.Show("Error: el numero debe ser un entero de 0 a 255", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show("Error: el numero debe ser un entero de 0 a 255", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        watch.Start();
+                        ConnectionManager.ParamValue = opacityValue; 
+                        ConnectionManager.FilterName = "Opacity";
+                        ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
+                    case 3:
+                        watch.Start();
+                        ConnectionManager.FilterName = "InvertColor";
+                        ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
+                    case 4:
+                        watch.Start();
+                        ConnectionManager.FilterName = "GaussianBlur";
+                        ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
+                    case 5: 
+                        watch.Start();
+                       
+                        double BrightValue = 0;
+                        try
+                        {
+                            BrightValue = double.Parse(filterPercentage.Text);
+                            if (BrightValue < 0 || BrightValue > 255)
+                            {
+                                MessageBox.Show("Error: Debe ser un numero entero", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return; 
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show("Error: el numero debe ser un entero", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        ConnectionManager.ParamValue = BrightValue; 
+                        ConnectionManager.FilterName = "Bright";
+                        ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
+                    case 6:
+                        watch.Start();
+                        ConnectionManager.FilterName = "ColorsBalance";
+                        ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
+
+                    case 7:
+                        Color sourceColor = colorSubstitution.getSourceColor();
+                        Color newColor = colorSubstitution.getNewColor();
+                        int colorThreshold = colorSubstitution.getThreshold();
+
+                        watch.Start();
+                        ConnectionManager.FilterName = "none";
+                        ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.Colors.Add(sourceColor);
+                        ConnectionManager.Colors.Add(newColor);                      
+                        ConnectionManager.ParamValue = colorThreshold; 
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
+                    case 8:
+                     
+                        ConnectionManager.FilterName = "CrudeHighPass";
+                        double darknessValue=0;
+                        Console.WriteLine(darknessValue); 
+                        try
+                        {
+                            darknessValue = double.Parse(filterPercentage.Text);
+                            if(darknessValue <= 0 || darknessValue > 255)
+                            {
+                                MessageBox.Show("Error: el numero debe ser un entero de 0 a 255", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return; 
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            MessageBox.Show("Error: el numero debe ser un entero de 0 a 255", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return; 
+                        }
+                        ConnectionManager.ParamValue = darknessValue; 
+                        ConnectionManager.Bitmap = imagePixels;
+                        watch.Start();
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");                        
+                        break;
+                    case 9:
+                        watch.Start();
+                        ConnectionManager.FilterName = "EdgeDetection";
+                        ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;                        
+                    case 10:
+
+                        break;
+                    case 11:
+                     
                     default:
                         break;
                 }
             }
-           
-
-            
- 
         }
-        
+
+      
         private void colorSelection()
         {
             
@@ -407,9 +527,7 @@ namespace ProyectoFiltros
                 else
                 {
                     initFilterApplication();
-                }
-                
-               
+                }                               
             }
         }
 
@@ -433,12 +551,24 @@ namespace ProyectoFiltros
                 filterPercentage.Visible = true;
 
             }
+            else if (availableFilters.SelectedIndex == 8)
+            {
+                filterAmount.Text = "Seleccione un numero de 0 a 255";
+                filterAmount.Visible = true;
+                filterPercentage.Visible = true;
+
+            }
         }
         
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             t.Dispose();
             
+        }
+
+        private void availableFilters_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
