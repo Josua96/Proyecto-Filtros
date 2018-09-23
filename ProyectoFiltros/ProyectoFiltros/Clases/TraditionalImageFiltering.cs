@@ -813,5 +813,23 @@ namespace ProyectoFiltros
             saveImage(result);
         }
 
+        public void CrudeHighPass(Bitmap image, int threshold)
+        {
+            int width = image.Width;
+            int height = image.Height;
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    Color pixel = image.GetPixel(x, y);
+                    int nowPixel = (pixel.R + pixel.G + pixel.B) / 3;
+                    if (nowPixel <= threshold)
+                    {
+                        image.SetPixel(x, y, Color.Black);
+                    }
+                }
+            }
+            saveImage(image);
+        }   
     }
 }

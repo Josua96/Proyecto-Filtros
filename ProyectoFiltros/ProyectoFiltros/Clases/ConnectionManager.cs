@@ -10,18 +10,25 @@ namespace ProyectoFiltros.Clases
 {
     class ConnectionManager
     {
-        private string toPath;
-        string filterName;
-        Bitmap bitmap;
-        List<Connection> Connections;
+        private string toPath; //Ruta donde se guardan las imagenes procesadas
+        string filterName; // Filtro que se quiere aplicar 
+        Bitmap bitmap; // Imagen que se le va a aplicar el filtro
+        List<Connection> Connections; // Lista de conexiones 
+        public List<Color> Colors; // Colores para el filtro de cambio de color 
+        private double paramValue; // Valor para los filtros que ocupan parametro especial
 
+
+        /// <summary>
+        /// Es el contructor de la clase
+        /// </summary>
         public ConnectionManager()
         {
             Connections = new List<Connection>();
             this.toPath = Directory.GetCurrentDirectory() + "\\outputimages\\" + "image";
+            Colors = new List<Color>();
         }
         
-        private void saveImage(Bitmap image)
+        private void SaveImage(Bitmap image)
         {
             image.Save(toPath + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".jpg");
         }
@@ -45,11 +52,35 @@ namespace ProyectoFiltros.Clases
             }
             else
             {
-                List<Bitmap> imagesForServers = divideImage(bitmap, serversList.Count);                 
+                List<Bitmap> imagesForServers = DivideImage(bitmap, serversList.Count);                 
                 for(int i=0; i<serversList.Count; i++)
                 {
-                    Connection connection = new Connection(1, filterName,imagesForServers.ElementAt(i) ,serversList.ElementAt(i));
-                    Connections.Add(connection); 
+                    Console.WriteLine(i);
+                    if(filterName=="Opacity" || filterName == "Bright" || filterName == "CrudeHighPass")
+                    {
+                        Console.WriteLine(filterName);
+                        Console.WriteLine(filterName);
+                        Console.WriteLine(i);
+                        Console.WriteLine(imagesForServers.ElementAt(i));
+                        Console.WriteLine(ParamValue);
+                        Console.WriteLine(serversList.ElementAt(i));                        
+                        Connection connection = new Connection(i,imagesForServers.ElementAt(i), filterName,ParamValue, serversList.ElementAt(i));
+                        Connections.Add(connection);
+                    }
+                    else if(filterName=="none")
+                    {                        
+                        Connection connection = new Connection(i,imagesForServers.ElementAt(i),Colors.ElementAt(0), Colors.ElementAt(1), 30, serversList.ElementAt(i));
+                        Connections.Add(connection);
+                    }
+                    else
+                    {                                              
+                        Console.WriteLine(i);
+                        Console.WriteLine(filterName);
+                        Console.WriteLine(imagesForServers.ElementAt(i));                     
+                        Console.WriteLine(serversList.ElementAt(i));
+                        Connection connection = new Connection(i, filterName, imagesForServers.ElementAt(i), serversList.ElementAt(i));
+                        Connections.Add(connection);                        
+                    }                 
                 }                
             }
         }
@@ -61,7 +92,7 @@ namespace ProyectoFiltros.Clases
         /// <param name="image"> Es el bitmap que se va a dividir</param>
         /// <param name="serversNumber">El numero de pedasos</param>
         /// <returns>Una lista de bitmaps que contienen los pedasos de imagen</returns>
-        public List<Bitmap> divideImage(Bitmap image, int serversNumber)
+        public List<Bitmap> DivideImage(Bitmap image, int serversNumber)
         {
             List<Bitmap> imageSlices = new List<Bitmap>();
             int width = image.Width;
@@ -94,7 +125,7 @@ namespace ProyectoFiltros.Clases
         /// </returns>
         public void ApplyFilter()
         {
-            Parallel.ForEach<Connection>(Connections,
+            Parallel.ForEach(Connections,
                 (conextion) =>
                 {                    
                     conextion.ApplyFilterAsync();                    
@@ -107,16 +138,20 @@ namespace ProyectoFiltros.Clases
                 }
             }
 
-            joinBitMaps(Connections); 
+            JoinBitMaps(Connections); 
         }
 
-
-        private Bitmap joinBitMaps(List<Connection> connectionsList)
+        /// <summary>
+        /// Permite unir imagenes 
+        /// </summary>
+        /// <param name="connectionsList">Recibe la lista de conexiones</param>
+        private void JoinBitMaps(List<Connection> connectionsList)
         {
             int serversNumber = connectionsList.Count;
             if (connectionsList.Count==0)
             {
-                return null; 
+                //Lanzar error
+                return; 
             }
             else
             {
@@ -134,8 +169,7 @@ namespace ProyectoFiltros.Clases
                         }                                                                          
                     }                 
                 }
-                saveImage(newImage); 
-                return newImage; 
+                SaveImage(newImage);                 
             }           
         }
 
@@ -156,5 +190,12 @@ namespace ProyectoFiltros.Clases
             set => filterName = value;
         }
 
+        /// <summary>
+        /// Permite Obtener o Asignar el parametro para ciertos filtros.
+        /// </summary>
+        public double ParamValue {
+            get => paramValue;
+            set => paramValue = value;
+        }
     }
 }

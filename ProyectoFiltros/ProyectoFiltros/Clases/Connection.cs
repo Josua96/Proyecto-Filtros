@@ -9,12 +9,11 @@ using System.Text;
 namespace ProyectoFiltros.Clases
 { 
     class Connection
-    {        
-        string filtername;
+    {                
         private Bitmap image;
-        String connectionAddress;
-        int id;
+        String connectionAddress;       
         public bool completed;
+        private NameValueCollection data; 
         Dictionary<string,string> responseData;
 
         /// <summary>
@@ -26,15 +25,75 @@ namespace ProyectoFiltros.Clases
         /// <param name="connectionAdds">Es la direcccion del servidor</param>
 
         public Connection(int imagePart, string filter, Bitmap bitmap, String connectionAdds)
-        {
-            id = imagePart;
-            filtername = filter;
+        {                        
             Image = bitmap;
-            connectionAddress = connectionAdds;
-            completed = false; 
+            connectionAddress = connectionAdds+ "/ApplyGeneralFilter";
+            completed = false;
+            data = new NameValueCollection(); 
+
+            var ms = new MemoryStream();
+            Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            string imageB64 = Convert.ToBase64String(ms.GetBuffer());
+            data["id"] = imagePart.ToString();
+            data["image"] = imageB64;
+            data["filterName"] = filter;
+
+            Console.WriteLine(connectionAddress+"     " +filter + "   "+ imagePart.ToString()); 
         }
 
 
+        /// <summary>
+        ///   Constructor de la conexion
+        /// </summary>
+        /// <param name="id">Idenficador de la conexion</param>
+        /// <param name="bitmap">Trozo de imagen a procesar</param>
+        /// <param name="filterName">Nombre del filtro</param>
+        /// <param name="paramValue">Valor del parametro requerido por el filtro</param>
+        /// <param name="connectionAdds">Direccion del servidor</param>
+        public Connection(int id, Bitmap bitmap, string filterName,double paramValue, String connectionAdds)
+        {
+            Image = bitmap;
+            connectionAddress = connectionAdds+"/OneParamFilter";
+            completed = false;
+            data = new NameValueCollection();
+
+            var ms = new MemoryStream();
+            Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            string imageB64 = Convert.ToBase64String(ms.GetBuffer());
+
+            data["id"] = id.ToString();
+            data["image"] = imageB64;
+            data["filterName"] = filterName;
+            data["paramValue"] = paramValue.ToString();
+        }
+
+
+        /// <summary>
+        ///   Este tipo de conexion solo sirve para el filtro de cambiar color.
+        /// </summary>
+        /// <param name="id">Idenficador de la conexion</param>
+        /// <param name="bitmap">Trozo de la imagen</param>
+        /// <param name="oldColor">Color que se quiere cambiar</param>
+        /// <param name="newColor">Nueco color</param>
+        /// <param name="tolerance">Valor requerido para este filtro</param>
+        /// <param name="connectionAdds">Direcccion del servidor</param>
+        public Connection(int id, Bitmap bitmap, Color oldColor, Color newColor, double tolerance, String connectionAdds)
+        {
+            Image = bitmap;
+            connectionAddress = connectionAdds+"/ColorsChange";
+            completed = false;
+            data = new NameValueCollection();
+
+            var ms = new MemoryStream();
+            Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            string imageB64 = Convert.ToBase64String(ms.GetBuffer());
+
+            data["id"] = id.ToString();
+            data["image"] = imageB64;
+            data["oldColor"] =  newColor.A.ToString()+","+newColor.R.ToString() + "," + newColor.G.ToString() + "," + newColor.B.ToString();
+            data["newColor"] = oldColor.A.ToString() + "," + oldColor.R.ToString() + "," + oldColor.G.ToString() + "," + oldColor.B.ToString();
+            data["threshold"] = tolerance.ToString();
+        }
         public Bitmap Image { get => image; set => image = value; }
 
 
@@ -43,7 +102,7 @@ namespace ProyectoFiltros.Clases
         /// </summary>
         /// <param name="response"> Es la respuesta de la consulta</param>
         /// <returns>Un diccionario con los datos de la respuesta del servidor</returns>
-        public Dictionary<string, string> decodingResponse(String response)
+        public Dictionary<string, string> DecodingResponse(String response)
         {
             response = response.Remove(0, 1);
             response = response.Remove(response.Length - 1, 1);            
@@ -76,24 +135,14 @@ namespace ProyectoFiltros.Clases
         /// <summary>
         ///  Permite llamar al web service para aplicar el filtro 
         /// </summary>                
-        public async void   ApplyFilterAsync()
-        {                      
-            var ms = new MemoryStream();                         
-            Image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
-            string imageB64 = Convert.ToBase64String(ms.GetBuffer());    
-            
+        public void ApplyFilterAsync()
+        {                                
             using (var wb = new WebClient())
-            {
-                var data = new NameValueCollection();
-                data["id"] = id.ToString();
-                data["image"] = imageB64;
-                data["filterName"] = filtername;
-
-                var response =  wb.UploadValues(connectionAddress, "POST", data);
+            {                                     
+                var response =  wb.UploadValues(connectionAddress, "POST", data);                
                 try
                 {
-
-                    responseData = decodingResponse(Encoding.UTF8.GetString(response));
+                    responseData = DecodingResponse(Encoding.UTF8.GetString(response));
                     Image = DecodeImageFromB64(responseData["imageData"]);
                     completed = true; 
                 }
@@ -102,5 +151,6 @@ namespace ProyectoFiltros.Clases
                 }                         
             }
         }
+        
    }
 }

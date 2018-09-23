@@ -44,8 +44,8 @@
             this.traditionalMethod = new System.Windows.Forms.Label();
             this.optimizedMethod = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.simpleModeB = new System.Windows.Forms.RadioButton();
             this.distributedModeB = new System.Windows.Forms.RadioButton();
+            this.simpleModeB = new System.Windows.Forms.RadioButton();
             this.infoConfig = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.imageContainer)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -209,17 +209,6 @@
             this.groupBox2.TabIndex = 18;
             this.groupBox2.TabStop = false;
             // 
-            // simpleModeB
-            // 
-            this.simpleModeB.AutoSize = true;
-            this.simpleModeB.Location = new System.Drawing.Point(29, 7);
-            this.simpleModeB.Name = "simpleModeB";
-            this.simpleModeB.Size = new System.Drawing.Size(84, 17);
-            this.simpleModeB.TabIndex = 0;
-            this.simpleModeB.TabStop = true;
-            this.simpleModeB.Text = "Modo simple";
-            this.simpleModeB.UseVisualStyleBackColor = true;
-            // 
             // distributedModeB
             // 
             this.distributedModeB.AutoSize = true;
@@ -227,9 +216,20 @@
             this.distributedModeB.Name = "distributedModeB";
             this.distributedModeB.Size = new System.Drawing.Size(102, 17);
             this.distributedModeB.TabIndex = 1;
-            this.distributedModeB.TabStop = true;
             this.distributedModeB.Text = "Modo distribuido";
             this.distributedModeB.UseVisualStyleBackColor = true;
+            // 
+            // simpleModeB
+            // 
+            this.simpleModeB.AutoSize = true;
+            this.simpleModeB.Checked = true;
+            this.simpleModeB.Location = new System.Drawing.Point(29, 7);
+            this.simpleModeB.Name = "simpleModeB";
+            this.simpleModeB.Size = new System.Drawing.Size(84, 17);
+            this.simpleModeB.TabIndex = 0;
+            this.simpleModeB.TabStop = true;
+            this.simpleModeB.Text = "Modo simple";
+            this.simpleModeB.UseVisualStyleBackColor = true;
             // 
             // infoConfig
             // 

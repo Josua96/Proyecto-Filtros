@@ -10,8 +10,6 @@ namespace WebService.Models
         public int id { get; set; }
         public string image { get; set; }
         public string filterName { get; set; }
-
         public double paramValue { get; set; }
-
     }
 }
