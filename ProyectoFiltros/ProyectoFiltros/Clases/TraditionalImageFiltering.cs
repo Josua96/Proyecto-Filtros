@@ -182,34 +182,17 @@ namespace ProyectoFiltros
             saveImage(bmp);
         }
 
-        public void brightFilter(Bitmap image, double bright)
+        public void invertColorsFilter(Bitmap image)
         {
-            Rectangle rect = new Rectangle(0, 0, image.Width, image.Height);
-            System.Drawing.Imaging.BitmapData bmpData = image.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, image.PixelFormat);
-            IntPtr ptr = bmpData.Scan0;
-            int bytes = Math.Abs(bmpData.Stride) * image.Height;
-            byte[] rgbValues = new byte[bytes];
-            System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
-            double correctionFactortemp = bright;
-            if (bright < 0)
+            for (int y = 0; (y <= (image.Height - 1)); y++)
             {
-                correctionFactortemp = 1 + bright;
-            }
-            for (int counter = 1; counter < rgbValues.Length; counter++)
-            {
-                double color = (double)rgbValues[counter];
-                if (bright < 0)
+                for (int x = 0; (x <= (image.Width - 1)); x++)
                 {
-                    color *= (int)correctionFactortemp;
+                    Color inv = image.GetPixel(x, y);
+                    inv = Color.FromArgb(255, (255 - inv.R), (255 - inv.G), (255 - inv.B));
+                    image.SetPixel(x, y, inv);
                 }
-                else
-                {
-                    color = (255 - color) * bright + color;
-                }
-                rgbValues[counter] = (byte)color;
             }
-            System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
-            image.UnlockBits(bmpData);
             saveImage(image);
         }
 
@@ -222,9 +205,6 @@ namespace ProyectoFiltros
             using (Graphics graphics = Graphics.FromImage(blurred))
                 graphics.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height),
                     new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
-
-
-
 
             // look at every pixel in the blur rectangle
             for (int xx = rectangle.X; xx < rectangle.X + rectangle.Width; xx++)
@@ -261,27 +241,41 @@ namespace ProyectoFiltros
                 }
             }
 
-            
+
 
             this.saveImage(blurred);
         }
 
-       
-
-        public void invertColorsFilter(Bitmap image)
+        public void brightFilter(Bitmap image, double bright)
         {
-            for (int y = 0; (y <= (image.Height - 1)); y++)
+            Rectangle rect = new Rectangle(0, 0, image.Width, image.Height);
+            System.Drawing.Imaging.BitmapData bmpData = image.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, image.PixelFormat);
+            IntPtr ptr = bmpData.Scan0;
+            int bytes = Math.Abs(bmpData.Stride) * image.Height;
+            byte[] rgbValues = new byte[bytes];
+            System.Runtime.InteropServices.Marshal.Copy(ptr, rgbValues, 0, bytes);
+            double correctionFactortemp = bright;
+            if (bright < 0)
             {
-                for (int x = 0; (x <= (image.Width - 1)); x++)
-                {
-                    Color inv = image.GetPixel(x, y);
-                    inv = Color.FromArgb(255, (255 - inv.R), (255 - inv.G), (255 - inv.B));
-                    image.SetPixel(x, y, inv);
-                }
+                correctionFactortemp = 1 + bright;
             }
+            for (int counter = 1; counter < rgbValues.Length; counter++)
+            {
+                double color = (double)rgbValues[counter];
+                if (bright < 0)
+                {
+                    color *= (int)correctionFactortemp;
+                }
+                else
+                {
+                    color = (255 - color) * bright + color;
+                }
+                rgbValues[counter] = (byte)color;
+            }
+            System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
+            image.UnlockBits(bmpData);
             saveImage(image);
-        }
-
+        }    
 
         public void colorsBalance(Bitmap image)
 
@@ -461,8 +455,362 @@ namespace ProyectoFiltros
             saveImage(bmpNew);
 
             return;
+        }
+
+        public void medianFilter(Bitmap sourceBitmap, int matrixSize)
+        {
+            BitmapData sourceData =
+                       sourceBitmap.LockBits(new Rectangle(0, 0,
+                       sourceBitmap.Width, sourceBitmap.Height),
+                       ImageLockMode.ReadOnly,
+                       PixelFormat.Format32bppArgb);
 
 
+            byte[] pixelBuffer = new byte[sourceData.Stride *
+                                          sourceData.Height];
+
+
+            byte[] resultBuffer = new byte[sourceData.Stride *
+                                           sourceData.Height];
+
+
+            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0,
+                                       pixelBuffer.Length);
+
+
+            sourceBitmap.UnlockBits(sourceData);
+
+
+            int filterOffset = (matrixSize - 1) / 2;
+            int calcOffset = 0;
+
+
+            int byteOffset = 0;
+
+
+            List<int> neighbourPixels = new List<int>();
+            byte[] middlePixel;
+
+
+            for (int offsetY = filterOffset; offsetY <
+                sourceBitmap.Height - filterOffset; offsetY++)
+            {
+                for (int offsetX = filterOffset; offsetX <
+                    sourceBitmap.Width - filterOffset; offsetX++)
+                {
+                    byteOffset = offsetY *
+                                 sourceData.Stride +
+                                 offsetX * 4;
+
+
+                    neighbourPixels.Clear();
+
+
+                    for (int filterY = -filterOffset;
+                        filterY <= filterOffset; filterY++)
+                    {
+                        for (int filterX = -filterOffset;
+                            filterX <= filterOffset; filterX++)
+                        {
+
+
+                            calcOffset = byteOffset +
+                                         (filterX * 4) +
+                                         (filterY * sourceData.Stride);
+
+
+                            neighbourPixels.Add(BitConverter.ToInt32(
+                                             pixelBuffer, calcOffset));
+                        }
+                    }
+
+
+                    neighbourPixels.Sort();
+
+                    middlePixel = BitConverter.GetBytes(
+                                       neighbourPixels[filterOffset]);
+
+
+                    resultBuffer[byteOffset] = middlePixel[0];
+                    resultBuffer[byteOffset + 1] = middlePixel[1];
+                    resultBuffer[byteOffset + 2] = middlePixel[2];
+                    resultBuffer[byteOffset + 3] = middlePixel[3];
+                }
+            }
+
+
+            Bitmap resultBitmap = new Bitmap(sourceBitmap.Width,
+                                             sourceBitmap.Height);
+
+
+            BitmapData resultData =
+                       resultBitmap.LockBits(new Rectangle(0, 0,
+                       resultBitmap.Width, resultBitmap.Height),
+                       ImageLockMode.WriteOnly,
+                       PixelFormat.Format32bppArgb);
+
+
+            Marshal.Copy(resultBuffer, 0, resultData.Scan0,
+                                       resultBuffer.Length);
+
+
+            resultBitmap.UnlockBits(resultData);
+
+
+            saveImage(resultBitmap);
+        }
+
+        public void solariseFilter(Bitmap sourceBitmap, byte blueValue, byte greenValue, byte redValue)
+        {
+            BitmapData sourceData = sourceBitmap.LockBits(new Rectangle(0, 0,
+                                    sourceBitmap.Width, sourceBitmap.Height),
+                                    ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+
+
+            byte[] pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+
+
+            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
+
+
+            sourceBitmap.UnlockBits(sourceData);
+
+
+            byte byte255 = 255;
+
+
+            for (int k = 0; k < pixelBuffer.Length; k += 4)
+            {
+                if (pixelBuffer[k] < blueValue)
+                {
+                    pixelBuffer[k] = (byte)(byte255 - pixelBuffer[k]);
+                }
+
+
+                if (pixelBuffer[k + 1] < greenValue)
+                {
+                    pixelBuffer[k + 1] = (byte)(byte255 - pixelBuffer[k + 1]);
+                }
+
+
+                if (pixelBuffer[k + 2] < redValue)
+                {
+                    pixelBuffer[k + 2] = (byte)(byte255 - pixelBuffer[k + 2]);
+                }
+            }
+
+
+            Bitmap resultBitmap = new Bitmap(sourceBitmap.Width, sourceBitmap.Height);
+
+            BitmapData resultData = resultBitmap.LockBits(new Rectangle(0, 0,
+                                     resultBitmap.Width, resultBitmap.Height),
+                                     ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+
+            Marshal.Copy(pixelBuffer, 0, resultData.Scan0, pixelBuffer.Length);
+            resultBitmap.UnlockBits(resultData);
+
+
+            saveImage(resultBitmap);
+        }
+
+        public void oilPaintFilter(Bitmap sourceBitmap, int levels, int filterSize)
+        {
+            BitmapData sourceData =
+                       sourceBitmap.LockBits(new Rectangle(0, 0,
+                       sourceBitmap.Width, sourceBitmap.Height),
+                       ImageLockMode.ReadOnly,
+                       PixelFormat.Format32bppArgb);
+
+
+            byte[] pixelBuffer = new byte[sourceData.Stride *
+                                          sourceData.Height];
+
+
+            byte[] resultBuffer = new byte[sourceData.Stride *
+                                           sourceData.Height];
+
+
+            Marshal.Copy(sourceData.Scan0, pixelBuffer, 0,
+                                       pixelBuffer.Length);
+
+
+            sourceBitmap.UnlockBits(sourceData);
+
+
+            int[] intensityBin = new int[levels];
+            int[] blueBin = new int[levels];
+            int[] greenBin = new int[levels];
+            int[] redBin = new int[levels];
+
+
+            levels = levels - 1;
+
+
+            int filterOffset = (filterSize - 1) / 2;
+            int byteOffset = 0;
+            int calcOffset = 0;
+            int currentIntensity = 0;
+            int maxIntensity = 0;
+            int maxIndex = 0;
+
+
+            double blue = 0;
+            double green = 0;
+            double red = 0;
+
+
+            for (int offsetY = filterOffset; offsetY <
+                sourceBitmap.Height - filterOffset; offsetY++)
+            {
+                for (int offsetX = filterOffset; offsetX <
+                    sourceBitmap.Width - filterOffset; offsetX++)
+                {
+                    blue = green = red = 0;
+
+
+                    currentIntensity = maxIntensity = maxIndex = 0;
+
+
+                    intensityBin = new int[levels + 1];
+                    blueBin = new int[levels + 1];
+                    greenBin = new int[levels + 1];
+                    redBin = new int[levels + 1];
+
+
+                    byteOffset = offsetY * sourceData.Stride + offsetX * 4;
+
+
+                    for (int filterY = -filterOffset;
+                        filterY <= filterOffset; filterY++)
+                    {
+                        for (int filterX = -filterOffset;
+                            filterX <= filterOffset; filterX++)
+                        {
+                            calcOffset = byteOffset +
+                                         (filterX * 4) +
+                                         (filterY * sourceData.Stride);
+
+
+                            currentIntensity = (int)Math.Round(((double)
+                                       (pixelBuffer[calcOffset] +
+                                       pixelBuffer[calcOffset + 1] +
+                                       pixelBuffer[calcOffset + 2]) / 3.0 *
+                                       (levels)) / 255.0);
+
+
+                            intensityBin[currentIntensity] += 1;
+                            blueBin[currentIntensity] += pixelBuffer[calcOffset];
+                            greenBin[currentIntensity] += pixelBuffer[calcOffset + 1];
+                            redBin[currentIntensity] += pixelBuffer[calcOffset + 2];
+
+
+                            if (intensityBin[currentIntensity] > maxIntensity)
+                            {
+                                maxIntensity = intensityBin[currentIntensity];
+                                maxIndex = currentIntensity;
+                            }
+                        }
+                    }
+
+
+                    blue = blueBin[maxIndex] / maxIntensity;
+                    green = greenBin[maxIndex] / maxIntensity;
+                    red = redBin[maxIndex] / maxIntensity;
+
+
+                    resultBuffer[byteOffset] = Convert.ToByte(blue);
+                    resultBuffer[byteOffset + 1] = Convert.ToByte(green);
+                    resultBuffer[byteOffset + 2] = Convert.ToByte(red);
+                    resultBuffer[byteOffset + 3] = 255;
+
+                }
+            }
+
+
+            Bitmap resultBitmap = new Bitmap(sourceBitmap.Width,
+                                             sourceBitmap.Height);
+
+
+            BitmapData resultData =
+                       resultBitmap.LockBits(new Rectangle(0, 0,
+                       resultBitmap.Width, resultBitmap.Height),
+                       ImageLockMode.WriteOnly,
+                       PixelFormat.Format32bppArgb);
+
+
+            Marshal.Copy(resultBuffer, 0, resultData.Scan0,
+                                       resultBuffer.Length);
+
+
+            resultBitmap.UnlockBits(resultData);
+
+
+            saveImage(resultBitmap);
+        }
+
+        //--------------------------------------------------------------------------------------------------------------
+        private Bitmap GrayScale(Bitmap image)
+        {
+            int width = image.Width;
+            int heigth = image.Height;
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < heigth; y++)
+                {
+                    Color pixel = image.GetPixel(x, y);
+                    int grayValue = (pixel.G + pixel.R + pixel.B) / 3;
+                    Color newColor = Color.FromArgb(grayValue, grayValue, grayValue);
+                    image.SetPixel(x, y, newColor);
+                }
+            }
+            return image;
+        }
+
+        public void EdgeFilter(Bitmap image)
+        {
+            Bitmap grayImage = GrayScale(image);
+            int[][] xs = new int[3][];
+            xs[0] = new int[3] { -1, 0, 1 };
+            xs[1] = new int[3] { -2, 0, 2 };
+            xs[2] = new int[3] { -1, 0, 1 };
+
+            int[][] ys = new int[3][];
+            ys[0] = new int[3] { 1, 2, 1 };
+            ys[1] = new int[3] { 0, 0, 0 };
+            ys[2] = new int[3] { -1, -2, -1 };
+
+            Bitmap result = new Bitmap(image);
+            for (int x = 1; x < image.Width - 2; x++)
+            {
+                for (int y = 1; y < image.Height - 2; y++)
+                {
+                    int pixelColorXS = (xs[0][0] * grayImage.GetPixel(x - 1, y - 1).R) + (xs[0][1] * grayImage.GetPixel(x, y - 1).R) + (xs[0][2] * grayImage.GetPixel(x + 1, y - 1).R) +
+                                       (xs[1][0] * grayImage.GetPixel(x - 1, y).R) + (xs[1][1] * grayImage.GetPixel(x, y).R) + (xs[1][2] * grayImage.GetPixel(x + 1, y).R) +
+                                       (xs[2][0] * grayImage.GetPixel(x - 1, y + 1).R) + (xs[2][1] * grayImage.GetPixel(x, y + 1).R) + (xs[2][2] * grayImage.GetPixel(x + 1, y + 1).R);
+
+                    int pixelColorYS = (ys[0][0] * grayImage.GetPixel(x - 1, y - 1).R) + (ys[0][1] * grayImage.GetPixel(x, y - 1).R) + (ys[0][2] * grayImage.GetPixel(x + 1, y - 1).R) +
+                                    (ys[1][0] * grayImage.GetPixel(x - 1, y).R) + (ys[1][1] * grayImage.GetPixel(x, y).R) + (ys[1][2] * grayImage.GetPixel(x + 1, y).R) +
+                                    (ys[2][0] * grayImage.GetPixel(x - 1, y + 1).R) + (ys[2][1] * grayImage.GetPixel(x, y + 1).R) + (ys[2][2] * grayImage.GetPixel(x + 1, y + 1).R);
+
+                    int pixelVa1 = (int)Math.Sqrt((pixelColorXS * pixelColorXS));
+                    int pixelVa2 = (int)Math.Sqrt((pixelColorYS * pixelColorYS));
+
+                    if (pixelVa1 > 50)
+                    {
+                        result.SetPixel(x, y, Color.White);
+                    }
+                    else if (pixelVa2 > 50)
+                    {
+                        result.SetPixel(x, y, Color.White);
+                    }
+                    else
+                    {
+                        result.SetPixel(x, y, Color.Black);
+                    }
+                }
+            }
+            saveImage(result);
         }
 
     }

@@ -38,16 +38,17 @@
             this.label1 = new System.Windows.Forms.Label();
             this.filterAmount = new System.Windows.Forms.Label();
             this.filterPercentage = new System.Windows.Forms.TextBox();
-            this.conPerdida = new System.Windows.Forms.RadioButton();
-            this.sinPerdida = new System.Windows.Forms.RadioButton();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.traditionalMethod = new System.Windows.Forms.Label();
             this.optimizedMethod = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.simpleModeB = new System.Windows.Forms.RadioButton();
+            this.distributedModeB = new System.Windows.Forms.RadioButton();
+            this.infoConfig = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.imageContainer)).BeginInit();
-            this.groupBox1.SuspendLayout();
+            this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // availableFilters
@@ -150,41 +151,6 @@
             this.filterPercentage.TabIndex = 9;
             this.filterPercentage.Visible = false;
             // 
-            // conPerdida
-            // 
-            this.conPerdida.AutoSize = true;
-            this.conPerdida.Location = new System.Drawing.Point(6, 18);
-            this.conPerdida.Name = "conPerdida";
-            this.conPerdida.Size = new System.Drawing.Size(34, 17);
-            this.conPerdida.TabIndex = 10;
-            this.conPerdida.TabStop = true;
-            this.conPerdida.Text = "Si";
-            this.conPerdida.UseVisualStyleBackColor = true;
-            this.conPerdida.Visible = false;
-            // 
-            // sinPerdida
-            // 
-            this.sinPerdida.AutoSize = true;
-            this.sinPerdida.Location = new System.Drawing.Point(70, 19);
-            this.sinPerdida.Name = "sinPerdida";
-            this.sinPerdida.Size = new System.Drawing.Size(39, 17);
-            this.sinPerdida.TabIndex = 11;
-            this.sinPerdida.TabStop = true;
-            this.sinPerdida.Text = "No";
-            this.sinPerdida.UseVisualStyleBackColor = true;
-            this.sinPerdida.Visible = false;
-            // 
-            // groupBox1
-            // 
-            this.groupBox1.Controls.Add(this.conPerdida);
-            this.groupBox1.Controls.Add(this.sinPerdida);
-            this.groupBox1.Location = new System.Drawing.Point(752, 159);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(123, 41);
-            this.groupBox1.TabIndex = 12;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Visible = false;
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -233,6 +199,48 @@
             this.optimizedMethod.Size = new System.Drawing.Size(0, 29);
             this.optimizedMethod.TabIndex = 17;
             // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.distributedModeB);
+            this.groupBox2.Controls.Add(this.simpleModeB);
+            this.groupBox2.Location = new System.Drawing.Point(372, 51);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(319, 30);
+            this.groupBox2.TabIndex = 18;
+            this.groupBox2.TabStop = false;
+            // 
+            // simpleModeB
+            // 
+            this.simpleModeB.AutoSize = true;
+            this.simpleModeB.Location = new System.Drawing.Point(29, 7);
+            this.simpleModeB.Name = "simpleModeB";
+            this.simpleModeB.Size = new System.Drawing.Size(84, 17);
+            this.simpleModeB.TabIndex = 0;
+            this.simpleModeB.TabStop = true;
+            this.simpleModeB.Text = "Modo simple";
+            this.simpleModeB.UseVisualStyleBackColor = true;
+            // 
+            // distributedModeB
+            // 
+            this.distributedModeB.AutoSize = true;
+            this.distributedModeB.Location = new System.Drawing.Point(202, 9);
+            this.distributedModeB.Name = "distributedModeB";
+            this.distributedModeB.Size = new System.Drawing.Size(102, 17);
+            this.distributedModeB.TabIndex = 1;
+            this.distributedModeB.TabStop = true;
+            this.distributedModeB.Text = "Modo distribuido";
+            this.distributedModeB.UseVisualStyleBackColor = true;
+            // 
+            // infoConfig
+            // 
+            this.infoConfig.Location = new System.Drawing.Point(915, 3);
+            this.infoConfig.Name = "infoConfig";
+            this.infoConfig.Size = new System.Drawing.Size(119, 32);
+            this.infoConfig.TabIndex = 19;
+            this.infoConfig.Text = "Información";
+            this.infoConfig.UseVisualStyleBackColor = true;
+            this.infoConfig.Click += new System.EventHandler(this.infoConfig_Click);
+            // 
             // Form1
             // 
             this.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
@@ -241,12 +249,13 @@
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(1036, 495);
+            this.Controls.Add(this.infoConfig);
+            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.optimizedMethod);
             this.Controls.Add(this.traditionalMethod);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.filterPercentage);
             this.Controls.Add(this.filterAmount);
             this.Controls.Add(this.label1);
@@ -260,8 +269,8 @@
             this.Name = "Form1";
             this.Text = "MainView";
             ((System.ComponentModel.ISupportInitialize)(this.imageContainer)).EndInit();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -279,14 +288,15 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label filterAmount;
         private System.Windows.Forms.TextBox filterPercentage;
-        private System.Windows.Forms.RadioButton conPerdida;
-        private System.Windows.Forms.RadioButton sinPerdida;
-        private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label traditionalMethod;
         private System.Windows.Forms.Label optimizedMethod;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.RadioButton distributedModeB;
+        private System.Windows.Forms.RadioButton simpleModeB;
+        private System.Windows.Forms.Button infoConfig;
     }
 }
 
