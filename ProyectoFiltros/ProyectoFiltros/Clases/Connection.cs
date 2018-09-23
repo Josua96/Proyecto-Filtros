@@ -37,7 +37,6 @@ namespace ProyectoFiltros.Clases
             data["id"] = imagePart.ToString();
             data["image"] = imageB64;
             data["filterName"] = filter;
-
             Console.WriteLine(connectionAddress+"     " +filter + "   "+ imagePart.ToString()); 
         }
 
@@ -136,21 +135,46 @@ namespace ProyectoFiltros.Clases
         ///  Permite llamar al web service para aplicar el filtro 
         /// </summary>                
         public void ApplyFilterAsync()
-        {                                
-            using (var wb = new WebClient())
-            {                                     
-                var response =  wb.UploadValues(connectionAddress, "POST", data);                
-                try
-                {
-                    responseData = DecodingResponse(Encoding.UTF8.GetString(response));
-                    Image = DecodeImageFromB64(responseData["imageData"]);
-                    completed = true; 
-                }
-                catch(Exception e)
-                {
-                }                         
+        {
+            MyWebClient webClient = new MyWebClient(new Uri(connectionAddress)); 
+
+            byte[ ] response = webClient.UploadValues(connectionAddress, "POST", data);                      
+            try
+            {
+                responseData = DecodingResponse(Encoding.UTF8.GetString(response));
+                Image = DecodeImageFromB64(responseData["imageData"]);
+                completed = true; 
+            }
+            catch(Exception e)
+            {
+            }                                     
+        }        
+   }
+
+    public class MyWebClient : WebClient
+    {
+        private int timeout;
+        public int Timeout
+        {
+            get
+            {
+                return timeout;
+            }
+            set
+            {
+                timeout = value;
             }
         }
-        
-   }
+        public MyWebClient(Uri address)
+        {
+            this.timeout = 600000;//In Milli seconds
+            var objWebClient = GetWebRequest(address);
+        }
+        protected override WebRequest GetWebRequest(Uri address)
+        {
+            var objWebRequest = base.GetWebRequest(address);
+            objWebRequest.Timeout = this.timeout;
+            return objWebRequest;
+        }
+    }
 }
