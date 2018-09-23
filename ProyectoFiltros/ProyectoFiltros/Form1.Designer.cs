@@ -57,6 +57,7 @@
             this.availableFilters.Name = "availableFilters";
             this.availableFilters.Size = new System.Drawing.Size(130, 21);
             this.availableFilters.TabIndex = 0;
+            this.availableFilters.SelectedIndexChanged += new System.EventHandler(this.availableFilters_SelectedIndexChanged);
             this.availableFilters.SelectionChangeCommitted += new System.EventHandler(this.availableFilters_SelectionChangeCommitted);
             // 
             // applyFilter

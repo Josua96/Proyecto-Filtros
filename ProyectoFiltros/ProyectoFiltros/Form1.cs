@@ -24,14 +24,13 @@ namespace ProyectoFiltros
         private int imageIndex;
         private int filterIndex;
         private ColorSubstitutionFilter colorSubstitution;
-
+        private ConnectionManager ConnectionManager; 
         public Form1()
         {
             InitializeComponent();
-
             
             traditionalFilter = new TraditionalImageFiltering();
-
+            this.ConnectionManager = new ConnectionManager();
             optimizedFilter = new OptimizedImageFiltering();
 
             colorSubstitution = new ColorSubstitutionFilter();
@@ -140,89 +139,116 @@ namespace ProyectoFiltros
             Bitmap imagePixels = new Bitmap(imageContainer.Image);
 
             Stopwatch watch = new Stopwatch();
-
-            switch (filterIndex)
+            bool local = true; 
+            if(local)
             {
-                case 0:
-                    watch.Start();
-                    traditionalFilter.sepiaFilter(imagePixels);              
-                    watch.Stop();
-                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s" );
-                    watch.Start();
-                    optimizedFilter.sepiaFilter(imagePixels);
-                    watch.Stop();
-                    this.updateTime( 2 , watch.Elapsed.TotalSeconds.ToString() + " s");
-                    break;
-                case 1:
-                    watch.Start();
-                    traditionalFilter.grayScaleFilter(imagePixels);
-                    watch.Stop();
-                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
-                    watch.Start();
-                    optimizedFilter.grayScaleFilter(imagePixels);
-                    watch.Stop();
-                    this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
-                    break;
-                case 2:
-                    watch.Start();
-                    try { traditionalFilter.opacityFilter(imagePixels, Convert.ToDouble(filterPercentage.Text)); }
-                    catch { traditionalFilter.opacityFilter(imagePixels, 55); }
-                    watch.Stop();
-                    break;
-                case 3:
-                    watch.Start();
-                    traditionalFilter.invertColorsFilter(imagePixels);
-                    watch.Stop();
-                    break;
-                case 4:
-                    watch.Start();
-                    traditionalFilter.GaussinBlurFilter(imagePixels, new Rectangle(0, 0, imagePixels.Width, imagePixels.Height), 4);
-                    watch.Stop();
-                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
-                    watch.Start();
-                    Thread.Sleep(1000);
-                    //optimizedFilter.gaussianBlurFilter2(imagePixels, new Rectangle(0, 0, imagePixels.Width, imagePixels.Height), 4);
-                    watch.Stop();
-                    this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+                switch (filterIndex)
+                {
+                    case 0:
+                        watch.Start();
+                        traditionalFilter.sepiaFilter(imagePixels);
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        watch.Start();
+                        optimizedFilter.sepiaFilter(imagePixels);
+                        watch.Stop();
+                        this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
+                    case 1:
+                        watch.Start();
+                        traditionalFilter.grayScaleFilter(imagePixels);
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        watch.Start();
+                        optimizedFilter.grayScaleFilter(imagePixels);
+                        watch.Stop();
+                        this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
+                    case 2:
+                        watch.Start();
+                        try { traditionalFilter.opacityFilter(imagePixels, Convert.ToDouble(filterPercentage.Text)); }
+                        catch { traditionalFilter.opacityFilter(imagePixels, 55); }
+                        watch.Stop();
+                        break;
+                    case 3:
+                        watch.Start();
+                        traditionalFilter.invertColorsFilter(imagePixels);
+                        watch.Stop();
+                        break;
+                    case 4:
+                        watch.Start();
+                        traditionalFilter.GaussinBlurFilter(imagePixels, new Rectangle(0, 0, imagePixels.Width, imagePixels.Height), 4);
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        watch.Start();
+                        Thread.Sleep(1000);
+                        //optimizedFilter.gaussianBlurFilter2(imagePixels, new Rectangle(0, 0, imagePixels.Width, imagePixels.Height), 4);
+                        watch.Stop();
+                        this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
 
-                    break;
+                        break;
 
-                case 5:
-                    watch.Start();
-                    try { traditionalFilter.brightFilter(imagePixels, Convert.ToDouble(filterPercentage.Text) / 100); }
-                    catch { traditionalFilter.brightFilter(imagePixels, 0.5); }
-                    watch.Stop();
-                    break;
+                    case 5:
+                        watch.Start();
+                        try { traditionalFilter.brightFilter(imagePixels, Convert.ToDouble(filterPercentage.Text) / 100); }
+                        catch { traditionalFilter.brightFilter(imagePixels, 0.5); }
+                        watch.Stop();
+                        break;
 
-                case 9:
-                    watch.Start();
-                    traditionalFilter.colorsBalance(imagePixels);
-                    watch.Stop();
-                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
-                    watch.Start();
-                    optimizedFilter.colorsBalance(imagePixels);
-                    watch.Stop();
-                    this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
-                    break;
+                    case 9:
+                        watch.Start();
+                        traditionalFilter.colorsBalance(imagePixels);
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        watch.Start();
+                        optimizedFilter.colorsBalance(imagePixels);
+                        watch.Stop();
+                        this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
 
-                case 10:
-                    watch.Start();
-                    traditionalFilter.colorSubstitution(imagePixels,colorSubstitution);
-                    watch.Stop();
-                    this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
-                    watch.Start();
-                    //esperar un segundo
-                    Thread.Sleep(1000);
-                    optimizedFilter.colorSubstitution(imagePixels, colorSubstitution);
-                    watch.Stop();
-                    this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
-                    break;
+                    case 10:
+                        watch.Start();
+                        traditionalFilter.colorSubstitution(imagePixels, colorSubstitution);
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        watch.Start();
+                        //esperar un segundo
+                        Thread.Sleep(1000);
+                        optimizedFilter.colorSubstitution(imagePixels, colorSubstitution);
+                        watch.Stop();
+                        this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;
 
 
-                default:
-                    break;
+                    default:
+                        break;
 
+                }
             }
+            else{
+
+                switch (filterIndex)
+                {
+                    case 0:
+                        watch.Start();
+                        ConnectionManager.FilterName = "Sepia";
+                        ConnectionManager.Bitmap = imagePixels;
+                        List<string> servers = new List<string>();
+                        servers.Add("http://172.24.107.139:89/ImageProcessingWebService/ApplyGeneralFilter");
+                        servers.Add("http://172.24.107.139:89/ImageProcessingWebService/ApplyGeneralFilter");
+                        servers.Add("http://172.24.107.139:89/ImageProcessingWebService/ApplyGeneralFilter");
+                        servers.Add("http://172.24.107.139:89/ImageProcessingWebService/ApplyGeneralFilter");
+
+                        ConnectionManager.AddConnections(servers);  // recorreria una lista de conecciones (dadas por el usuario)
+                        ConnectionManager.ApplyFilter(); 
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");                      
+                        break;                  
+                    default:
+                        break;
+                }
+            }
+           
 
             
  
@@ -324,6 +350,11 @@ namespace ProyectoFiltros
                 conPerdida.Visible = true;
                 sinPerdida.Visible = true;
             }
+        }
+
+        private void availableFilters_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
