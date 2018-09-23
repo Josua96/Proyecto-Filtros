@@ -66,7 +66,6 @@ namespace ProyectoFiltros
             availableFilters.Items.Add("Remplazo de color");
             availableFilters.Items.Add("Oscurecer");
             availableFilters.Items.Add("Bordes");
-
             availableFilters.Items.Add("Solarizado");
             availableFilters.Items.Add("Mediana");            
         }
@@ -353,7 +352,7 @@ namespace ProyectoFiltros
                         break;
                     case 3:
                         watch.Start();
-                        ConnectionManager.FilterName = "InvertColor";
+                        ConnectionManager.FilterName = "InvertColors";
                         ConnectionManager.Bitmap = imagePixels;
                         ConnectionManager.AddConnections(servers);
                         ConnectionManager.ApplyFilter();
@@ -458,7 +457,13 @@ namespace ProyectoFiltros
                         this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;                        
                     case 10:
-
+                        watch.Start();
+                        ConnectionManager.FilterName = "SolariseFilter";
+                        ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.AddConnections(servers);
+                        ConnectionManager.ApplyFilter();
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;
                     case 11:
                      
