@@ -60,7 +60,6 @@
             this.availableFilters.Name = "availableFilters";
             this.availableFilters.Size = new System.Drawing.Size(130, 21);
             this.availableFilters.TabIndex = 0;
-            this.availableFilters.SelectionChangeCommitted += new System.EventHandler(this.availableFilters_SelectionChangeCommitted);
             // 
             // applyFilter
             // 
@@ -286,7 +285,7 @@
             this.Controls.Add(this.applyFilter);
             this.Controls.Add(this.availableFilters);
             this.Name = "Form1";
-            this.Text = "MainView";
+            this.Text = "Main View";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.imageContainer)).EndInit();
             this.groupBox2.ResumeLayout(false);
