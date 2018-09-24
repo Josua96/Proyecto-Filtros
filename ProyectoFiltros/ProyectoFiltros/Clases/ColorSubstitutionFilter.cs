@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace ProyectoFiltros.Clases
 {
+    /// <summary>
+    /// Clase para implementar el filtro de cambio de color, Esta clase sirve como almacenamiento temporal. 
+    /// </summary>
     class ColorSubstitutionFilter
     {
 

@@ -56,10 +56,23 @@
             // availableFilters
             // 
             this.availableFilters.FormattingEnabled = true;
+            this.availableFilters.Items.AddRange(new object[] {
+            "Sepia",
+            "Escala de grises",
+            "Opacidad",
+            "Invertir colores",
+            "Desenfoque Gaussiano",
+            "Ajuste de brillo",
+            "Balance de colores",
+            "Remplazo de color",
+            "Oscurecer",
+            "Bordes",
+            "Solarizado"});
             this.availableFilters.Location = new System.Drawing.Point(561, 179);
             this.availableFilters.Name = "availableFilters";
             this.availableFilters.Size = new System.Drawing.Size(130, 21);
             this.availableFilters.TabIndex = 0;
+            this.availableFilters.SelectedIndexChanged += new System.EventHandler(this.availableFilters_SelectedIndexChanged);
             // 
             // applyFilter
             // 
@@ -265,6 +278,7 @@
             this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(1036, 495);
+            this.Controls.Add(this.availableFilters);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.CPUusage);
             this.Controls.Add(this.label5);
@@ -283,7 +297,6 @@
             this.Controls.Add(this.searchImage);
             this.Controls.Add(this.title);
             this.Controls.Add(this.applyFilter);
-            this.Controls.Add(this.availableFilters);
             this.Name = "Form1";
             this.Text = "Main View";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);

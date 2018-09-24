@@ -53,7 +53,7 @@ namespace ProyectoFiltros.Clases
             });
         }
 
-        public void Process(int radial)
+        public Bitmap Process(int radial)
         {
             var newAlpha = new int[_width * _height];
             var newRed = new int[_width * _height];
@@ -88,6 +88,7 @@ namespace ProyectoFiltros.Clases
             Marshal.Copy(dest, 0, bits2.Scan0, dest.Length);
             image.UnlockBits(bits2);
             saveImage(image);
+            return image;
         }
 
         private void gaussBlur_4(int[] source, int[] dest, int r)

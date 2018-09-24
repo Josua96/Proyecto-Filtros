@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace ProyectoFiltros.Clases
 {
+    /// <summary>
+    /// Esta clase contienen los filtros tradicionales, estos filtros se ejecutan cada uno de manera paralela
+    /// por eso los llamamos obtimizados.
+    /// </summary>
     class OptimizedImageFiltering
     {
 
@@ -24,7 +28,7 @@ namespace ProyectoFiltros.Clases
             image.Save(toPath + DateTime.Now.ToString("yyyy-dd-M--HH-mm-ss") + ".jpg");
         }
 
-        public void sepiaFilter(Bitmap imageBitMap)
+        public Bitmap sepiaFilter(Bitmap imageBitMap)
         {
 
             Bitmap image = new Bitmap(imageBitMap);
@@ -85,11 +89,11 @@ namespace ProyectoFiltros.Clases
 
             }
 
-            return;
+            return image;
 
         }
 
-        public void grayScaleFilter(Bitmap imageBitMap)
+        public Bitmap grayScaleFilter(Bitmap imageBitMap)
         {
 
             Bitmap image = new Bitmap(imageBitMap);
@@ -130,11 +134,11 @@ namespace ProyectoFiltros.Clases
 
             }
 
-            return;
+            return image;
 
         }
 
-        public void opacityFilter(Bitmap bmp, double opacity)
+        public Bitmap opacityFilter(Bitmap bmp, double opacity)
         {
             const int bytesPerPixel = 4;
 
@@ -168,9 +172,10 @@ namespace ProyectoFiltros.Clases
 
             bmp.UnlockBits(bmpData);
             saveImage(bmp);
+            return bmp; 
         }
 
-        public void invertColorsFilter(Bitmap image)
+        public Bitmap invertColorsFilter(Bitmap image)
         {
             Parallel.For((image.Height - 1), 0, y => {
                 Parallel.For((image.Width - 1), 0, x => {
@@ -181,9 +186,10 @@ namespace ProyectoFiltros.Clases
             });
 
             saveImage(image);
+            return image; 
         }
 
-        public void brightFilter(Bitmap image, double bright)
+        public Bitmap brightFilter(Bitmap image, double bright)
         {
             Rectangle rect = new Rectangle(0, 0, image.Width, image.Height);
             System.Drawing.Imaging.BitmapData bmpData = image.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadWrite, image.PixelFormat);
@@ -213,9 +219,10 @@ namespace ProyectoFiltros.Clases
             System.Runtime.InteropServices.Marshal.Copy(rgbValues, 0, ptr, bytes);
             image.UnlockBits(bmpData);
             saveImage(image);
+            return image;
         }
 
-        public void colorsBalance(Bitmap imageBitMap)
+        public Bitmap colorsBalance(Bitmap imageBitMap)
         {
             Bitmap image = new Bitmap(imageBitMap);
 
@@ -289,10 +296,10 @@ namespace ProyectoFiltros.Clases
 
             }
 
-            return;
+            return image;
         }
 
-        public void colorSubstitution(Bitmap imageBitmap, ColorSubstitutionFilter changer)
+        public Bitmap colorSubstitution(Bitmap imageBitmap, ColorSubstitutionFilter changer)
         {
             Bitmap image = new Bitmap(imageBitmap);
 
@@ -408,10 +415,10 @@ namespace ProyectoFiltros.Clases
                 saveImage(image);
             }
 
-            return;
+            return image;
         }
 
-        public void solariseFilter(Bitmap sourceBitmap, byte blueValue, byte greenValue, byte redValue)
+        public Bitmap solariseFilter(Bitmap sourceBitmap, byte blueValue, byte greenValue, byte redValue)
         {
             Bitmap image = new Bitmap(sourceBitmap);
 
@@ -467,7 +474,7 @@ namespace ProyectoFiltros.Clases
 
             }
 
-            return;
+            return image;
         }
 
         //----------------------------------------------------------------------------------------------------------------------
@@ -509,7 +516,7 @@ namespace ProyectoFiltros.Clases
             return image;
         }
 
-        public void EdgeFilter(Bitmap image)
+        public Bitmap EdgeFilter(Bitmap image)
         {
             Bitmap grayImage = GrayScale(image);
             int[][] xs = new int[3][];
@@ -553,9 +560,10 @@ namespace ProyectoFiltros.Clases
                 }
             }
             saveImage(result);
+            return result;
         }
 
-        public void CrudeHighPass(Bitmap image, int threshold)
+        public Bitmap CrudeHighPass(Bitmap image, int threshold)
         {
             Parallel.For((image.Height - 1), 0, y => {
                 Parallel.For((image.Width - 1), 0, x => {
@@ -568,6 +576,7 @@ namespace ProyectoFiltros.Clases
                 });
             });
             saveImage(image);
+            return image;
         }
 
     }

@@ -124,7 +124,7 @@ namespace ProyectoFiltros.Clases
         /// <returns>
         /// Retorna un bitmap de toda la imagen con el filtro aplicado
         /// </returns>
-        public void ApplyFilter()
+        public Image ApplyFilter()
         {
             try
             {
@@ -137,7 +137,7 @@ namespace ProyectoFiltros.Clases
             catch(Exception e)
             {
                 MessageBox.Show("Error de servidor", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
+                return null;
             }
                  
             for(int i=0; i<Connections.Count; i++)
@@ -148,20 +148,20 @@ namespace ProyectoFiltros.Clases
                 }
             }
 
-            JoinBitMaps(Connections); 
+            return JoinBitMaps(Connections);             
         }
 
         /// <summary>
         /// Permite unir imagenes 
         /// </summary>
-        /// <param name="connectionsList">Recibe la lista de conexiones</param>
-        private void JoinBitMaps(List<Connection> connectionsList)
+        /// < name="connectionsList">Recibe la lista de conexiones</param>
+        private Bitmap JoinBitMaps(List<Connection> connectionsList)
         {
             int serversNumber = connectionsList.Count;
             if (connectionsList.Count==0)
             {
                 //Lanzar error
-                return; 
+                return null; 
             }
             else
             {
@@ -179,7 +179,8 @@ namespace ProyectoFiltros.Clases
                         }                                                                          
                     }                 
                 }
-                SaveImage(newImage);                 
+                SaveImage(newImage);
+                return newImage; 
             }           
         }
 
