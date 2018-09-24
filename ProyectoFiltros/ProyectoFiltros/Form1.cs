@@ -148,6 +148,7 @@ namespace ProyectoFiltros
 
             if (local)
             {
+                Console.WriteLine(filterIndex);
                 switch (filterIndex)
                 {
                     case 0:
@@ -400,7 +401,7 @@ namespace ProyectoFiltros
                         int colorThreshold = colorSubstitution.getThreshold();
 
                         watch.Start();
-                        ConnectionManager.FilterName = "none";
+                        ConnectionManager.FilterName = "ColorSubstitution";
                         ConnectionManager.Bitmap = imagePixels;
                         ConnectionManager.Colors.Clear(); 
                         ConnectionManager.Colors.Add(sourceColor);
@@ -412,27 +413,9 @@ namespace ProyectoFiltros
                         updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;
                     case 8:
-                     
-                        ConnectionManager.FilterName = "CrudeHighPass";
-                        double darknessValue=0;
-                        Console.WriteLine(darknessValue); 
-                        try
-                        {
-                            darknessValue = double.Parse(filterPercentage.Text);
-                            if(darknessValue <= 0 || darknessValue > 255)
-                            {
-                                MessageBox.Show("Error: el numero debe ser un entero de 0 a 255", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return; 
-                            }
-                        }
-                        catch(Exception e)
-                        {
-                            MessageBox.Show("Error: el numero debe ser un entero de 0 a 255", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            return; 
-                        }
-                        ConnectionManager.ParamValue = darknessValue; 
-                        ConnectionManager.Bitmap = imagePixels;
                         watch.Start();
+                        ConnectionManager.FilterName = "SolariseFilter";
+                        ConnectionManager.Bitmap = imagePixels;
                         ConnectionManager.AddConnections(servers);
                         ConnectionManager.ApplyFilter();
                         watch.Stop();
@@ -448,9 +431,26 @@ namespace ProyectoFiltros
                         updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;                        
                     case 10:
-                        watch.Start();
-                        ConnectionManager.FilterName = "SolariseFilter";
+                        ConnectionManager.FilterName = "CrudeHighPass";
+                        double darknessValue = 0;
+                        Console.WriteLine(darknessValue);
+                        try
+                        {
+                            darknessValue = double.Parse(filterPercentage.Text);
+                            if (darknessValue <= 0 || darknessValue > 255)
+                            {
+                                MessageBox.Show("Error: el numero debe ser un entero de 0 a 255", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            MessageBox.Show("Error: el numero debe ser un entero de 0 a 255", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+                        ConnectionManager.ParamValue = darknessValue;
                         ConnectionManager.Bitmap = imagePixels;
+                        watch.Start();
                         ConnectionManager.AddConnections(servers);
                         ConnectionManager.ApplyFilter();
                         watch.Stop();
@@ -524,45 +524,13 @@ namespace ProyectoFiltros
                 }                               
             }
         }
-
-        private void availableFilters_SelectionChangeCommitted(object sender, EventArgs e)
-        {
-            filterAmount.Text = "";
-            filterAmount.Visible = false;
-            filterPercentage.Text = "";
-            filterPercentage.Visible = false;
-
-            if (availableFilters.SelectedIndex == 2)
-            {
-                filterAmount.Text = "Porcentaje de opacidad";
-                filterAmount.Visible = true;
-                filterPercentage.Visible = true;
-            }
-            else if (availableFilters.SelectedIndex == 5)
-            {
-                filterAmount.Text = "Porcentaje de brillo";
-                filterAmount.Visible = true;
-                filterPercentage.Visible = true;
-
-            }
-            else if (availableFilters.SelectedIndex == 8)
-            {
-                filterAmount.Text = "Seleccione un numero de 0 a 255";
-                filterAmount.Visible = true;
-                filterPercentage.Visible = true;
-
-            }
-        }
         
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             t.Dispose();
             
         }
-
-        private void availableFilters_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
+        
     }
 }

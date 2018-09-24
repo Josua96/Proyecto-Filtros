@@ -149,7 +149,6 @@ namespace ProyectoFiltros.Clases
             byte[] argbValues = new byte[numBytes];
 
             System.Runtime.InteropServices.Marshal.Copy(ptr, argbValues, 0, numBytes);
-            Console.Write(argbValues.ToString());
 
             Parallel.For(argbValues.Length, 0, counter =>
             {
@@ -472,7 +471,7 @@ namespace ProyectoFiltros.Clases
         }
 
         //----------------------------------------------------------------------------------------------------------------------
-        private Bitmap GrayScale(Bitmap imageBitMap)
+        public Bitmap GrayScale(Bitmap imageBitMap)
         {
             Bitmap image = new Bitmap(imageBitMap);
 
@@ -505,12 +504,8 @@ namespace ProyectoFiltros.Clases
 
                     }
                 });
-
-
                 image.UnlockBits(bitmapData);
-
             }
-
             return image;
         }
 
@@ -558,6 +553,21 @@ namespace ProyectoFiltros.Clases
                 }
             }
             saveImage(result);
+        }
+
+        public void CrudeHighPass(Bitmap image, int threshold)
+        {
+            Parallel.For((image.Height - 1), 0, y => {
+                Parallel.For((image.Width - 1), 0, x => {
+                    Color pixel = image.GetPixel(x, y);
+                    int nowPixel = (pixel.R + pixel.G + pixel.B) / 3;
+                    if (nowPixel <= threshold)
+                    {
+                        image.SetPixel(x, y, Color.Black);
+                    }
+                });
+            });
+            saveImage(image);
         }
 
     }
