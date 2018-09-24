@@ -89,9 +89,12 @@ namespace ProyectoFiltros.Clases
 
             data["id"] = id.ToString();
             data["image"] = imageB64;
-            data["oldColor"] =  newColor.A.ToString()+","+newColor.R.ToString() + "," + newColor.G.ToString() + "," + newColor.B.ToString();
-            data["newColor"] = oldColor.A.ToString() + "," + oldColor.R.ToString() + "," + oldColor.G.ToString() + "," + oldColor.B.ToString();
+            data["newColor"] =  newColor.A.ToString()+","+newColor.R.ToString() + "," + newColor.G.ToString() + "," + newColor.B.ToString();
+            data["oldColor"] = oldColor.A.ToString() + "," + oldColor.R.ToString() + "," + oldColor.G.ToString() + "," + oldColor.B.ToString();
             data["threshold"] = tolerance.ToString();
+
+            Console.WriteLine(data["newColor"]);
+            Console.WriteLine(data["oldColor"]);
         }
         public Bitmap Image { get => image; set => image = value; }
 

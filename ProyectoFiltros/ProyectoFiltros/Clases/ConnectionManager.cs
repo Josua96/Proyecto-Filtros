@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace ProyectoFiltros.Clases
 {
@@ -69,7 +70,7 @@ namespace ProyectoFiltros.Clases
                     }
                     else if(filterName=="none")
                     {                        
-                        Connection connection = new Connection(i,imagesForServers.ElementAt(i),Colors.ElementAt(0), Colors.ElementAt(1), 30, serversList.ElementAt(i));
+                        Connection connection = new Connection(i,imagesForServers.ElementAt(i),Colors.ElementAt(0), Colors.ElementAt(1), 60, serversList.ElementAt(i));
                         Connections.Add(connection);
                     }
                     else
@@ -125,11 +126,20 @@ namespace ProyectoFiltros.Clases
         /// </returns>
         public void ApplyFilter()
         {
-            Parallel.ForEach(Connections,
-                (conextion) =>
-                {                    
-                    conextion.ApplyFilterAsync();                    
-                });         
+            try
+            {
+                Parallel.ForEach(Connections,
+             (conextion) =>
+             {
+                 conextion.ApplyFilterAsync();
+             });
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show("Error de servidor", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+                 
             for(int i=0; i<Connections.Count; i++)
             {
                 if(!Connections.ElementAt(i).completed)

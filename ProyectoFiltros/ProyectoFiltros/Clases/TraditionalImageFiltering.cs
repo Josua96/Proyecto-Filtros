@@ -444,9 +444,8 @@ namespace ProyectoFiltros
                 }
             }
 
+            Console.WriteLine("SE aplicó un filtro a la imagen");
             Marshal.Copy(resultBuffer, 0, ptr, resultBuffer.Length);
-
-
             bmpNew.UnlockBits(bmpData);
 
             bmpData = null;

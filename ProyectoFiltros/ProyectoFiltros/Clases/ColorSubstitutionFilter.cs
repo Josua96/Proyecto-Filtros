@@ -10,7 +10,7 @@ namespace ProyectoFiltros.Clases
     class ColorSubstitutionFilter
     {
 
-        private int threshold = 27;
+        private int threshold = 40;
 
         private Color sourceColor;
         private Color newColor;

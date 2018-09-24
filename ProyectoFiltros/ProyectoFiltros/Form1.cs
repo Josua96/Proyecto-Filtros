@@ -28,7 +28,7 @@ namespace ProyectoFiltros
             servers.Add("http://172.24.65.181:89/ImageProcessingWebService");
             servers.Add("http://172.24.65.181:89/ImageProcessingWebService");
             servers.Add("http://172.24.65.181:89/ImageProcessingWebService");
-
+            servers.Add("http://172.24.65.181:89/ImageProcessingWebService");
             traditionalFilter = new TraditionalImageFiltering();
             this.ConnectionManager = new ConnectionManager();
             optimizedFilter = new OptimizedImageFiltering();
@@ -66,8 +66,7 @@ namespace ProyectoFiltros
             availableFilters.Items.Add("Remplazo de color");
             availableFilters.Items.Add("Oscurecer");
             availableFilters.Items.Add("Bordes");
-            availableFilters.Items.Add("Solarizado");
-            availableFilters.Items.Add("Mediana");            
+            availableFilters.Items.Add("Solarizado");                      
         }
 
         private void setImages(string[] imageNames)
@@ -104,7 +103,6 @@ namespace ProyectoFiltros
                 imageIndex--;
                 imageContainer.Image = (Image)images[imageIndex];
                 imageContainer.Refresh();
-
             }
         }
 
@@ -115,7 +113,6 @@ namespace ProyectoFiltros
                 imageIndex++;
                 imageContainer.Image = (Image)images[imageIndex];
                 imageContainer.Refresh();
-
             }
         }
 
@@ -125,9 +122,7 @@ namespace ProyectoFiltros
             {
                 this.BeginInvoke(new Action(() =>
                 {
-
                     traditionalMethod.Text = time;
-
                 }));
             }
 
@@ -189,14 +184,8 @@ namespace ProyectoFiltros
                         }
                         catch
                         {
-                            watch.Start();
-                            traditionalFilter.opacityFilter(imagePixels, 55);
-                            watch.Stop();
-                            this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
-                            watch.Start();
-                            optimizedFilter.opacityFilter(imagePixels, 55);
-                            watch.Stop();
-                            this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+                            MessageBox.Show("Verifica el dato de entrada", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
                         }
                         break;
                     case 3:
@@ -234,17 +223,11 @@ namespace ProyectoFiltros
                         }
                         catch
                         {
-                            watch.Start();
-                            traditionalFilter.brightFilter(imagePixels, 0.5);
-                            watch.Stop();
-                            this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
-                            watch.Start();
-                            optimizedFilter.brightFilter(imagePixels, 0.5);
-                            watch.Stop();
-                            this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+                            MessageBox.Show("Verifica el dato de entrada", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return; 
                         }
                         break;
-                    case 9:
+                    case 6:
                         watch.Start();
                         traditionalFilter.colorsBalance(imagePixels);
                         watch.Stop();
@@ -254,7 +237,7 @@ namespace ProyectoFiltros
                         watch.Stop();
                         this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;
-                    case 10:
+                    case 7:
                         watch.Start();
                         traditionalFilter.colorSubstitution(imagePixels, colorSubstitution);
                         watch.Stop();
@@ -266,29 +249,26 @@ namespace ProyectoFiltros
                         watch.Stop();
                         this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;
-                    case 11:
-                        watch.Start();
-                        traditionalFilter.medianFilter(imagePixels, 11);
-                        watch.Stop();
-                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                    case 8:
+                        try
+                        {
+                            watch.Start();
+                            traditionalFilter.CrudeHighPass(imagePixels, Convert.ToInt32(filterPercentage.Text) / 100);
+                            watch.Stop();
+                            this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                            watch.Start();
+                            //optimizedFilter.CrudeHighPass(imagePixels, Convert.ToDouble(filterPercentage.Text) / 100);
+                            watch.Stop();
+                            this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        }
+                        catch
+                        {
+
+                            MessageBox.Show("Verifica el dato de entrada", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
                         break;
-                    case 12:
-                        watch.Start();
-                        traditionalFilter.solariseFilter(imagePixels, 25, 40, 52);
-                        watch.Stop();
-                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
-                        watch.Start();
-                        optimizedFilter.solariseFilter(imagePixels, 25, 40, 52);
-                        watch.Stop();
-                        this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
-                        break;
-                    case 13:
-                        watch.Start();
-                        traditionalFilter.oilPaintFilter(imagePixels, 40, 20);
-                        watch.Stop();
-                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
-                        break;
-                    case 14:
+                    case 9:
                         watch.Start();
                         traditionalFilter.EdgeFilter(imagePixels);
                         watch.Stop();
@@ -298,6 +278,16 @@ namespace ProyectoFiltros
                         watch.Stop();
                         this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;
+                    case 10:
+                        watch.Start();
+                        traditionalFilter.solariseFilter(imagePixels, 25, 40, 52);
+                        watch.Stop();
+                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        watch.Start();
+                        optimizedFilter.solariseFilter(imagePixels, 25, 40, 52);
+                        watch.Stop();
+                        this.updateTime(2, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;                  
                     default:
                         break;
                 }
@@ -325,7 +315,7 @@ namespace ProyectoFiltros
                         watch.Stop();
                         this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;
-                    case 2: // Hay que ponerle el parametro
+                    case 2: 
                         double opacityValue = 0;
                         try
                         {
@@ -412,13 +402,14 @@ namespace ProyectoFiltros
                         watch.Start();
                         ConnectionManager.FilterName = "none";
                         ConnectionManager.Bitmap = imagePixels;
+                        ConnectionManager.Colors.Clear(); 
                         ConnectionManager.Colors.Add(sourceColor);
                         ConnectionManager.Colors.Add(newColor);                      
                         ConnectionManager.ParamValue = colorThreshold; 
                         ConnectionManager.AddConnections(servers);
                         ConnectionManager.ApplyFilter();
                         watch.Stop();
-                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;
                     case 8:
                      
@@ -445,7 +436,7 @@ namespace ProyectoFiltros
                         ConnectionManager.AddConnections(servers);
                         ConnectionManager.ApplyFilter();
                         watch.Stop();
-                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");                        
+                        updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");                        
                         break;
                     case 9:
                         watch.Start();
@@ -454,7 +445,7 @@ namespace ProyectoFiltros
                         ConnectionManager.AddConnections(servers);
                         ConnectionManager.ApplyFilter();
                         watch.Stop();
-                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
                         break;                        
                     case 10:
                         watch.Start();
@@ -463,10 +454,8 @@ namespace ProyectoFiltros
                         ConnectionManager.AddConnections(servers);
                         ConnectionManager.ApplyFilter();
                         watch.Stop();
-                        this.updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
-                        break;
-                    case 11:
-                     
+                        updateTime(1, watch.Elapsed.TotalSeconds.ToString() + " s");
+                        break;                              
                     default:
                         break;
                 }
@@ -521,7 +510,7 @@ namespace ProyectoFiltros
             {
                 filterIndex = availableFilters.SelectedIndex;
 
-                if (filterIndex== 10)
+                if (filterIndex== 7)
                 {
                     this.colorSelection();
                     if (this.colorSubstitution.getCorrectColorSelection()==true)
